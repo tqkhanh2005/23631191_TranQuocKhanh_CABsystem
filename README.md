@@ -126,24 +126,57 @@ Các tính năng nâng cao và các yêu cầu chưa có business rule rõ ràng
 | **RBAC** | Phân quyền cơ bản giữa Customer, Driver, Operation và Admin | Must Have |
 | **Audit Log** | Lưu vết một số thao tác quản trị quan trọng | Should Have |
 
+## Xác định phạm vi dự án trong 7 tuần
+
+### 1. Mục tiêu phạm vi
+
+Trong thời gian 7 tuần, dự án tập trung xây dựng **MVP (Minimum Viable Product)** của CAB System, với mục tiêu cung cấp một hệ thống đặt xe trực tuyến cơ bản nhưng có đầy đủ quy trình nghiệp vụ cốt lõi.
+
+Phạm vi MVP phải đảm bảo khách hàng có thể thực hiện một chuyến xe hoàn chỉnh theo quy trình:
+
+**Đăng nhập → Đặt xe → Tìm tài xế → Tài xế nhận chuyến → Thực hiện chuyến → Hoàn thành → Tính cước → Thanh toán**
+
+Đồng thời, tài xế và nhân viên vận hành phải có các chức năng tối thiểu để tham gia và quản lý quy trình trên.
+
 ---
 
-### 3. Quy trình nghiệp vụ nằm trong MVP
+### 2. Phạm vi trong dự án (In Scope)
 
-#### 3.1. Quy trình đặt xe
+| Nhóm chức năng | Phạm vi |
+|---|---|
+| **Quản lý tài khoản** | Đăng ký, đăng nhập, đăng xuất và cập nhật thông tin cá nhân cho Customer/Driver. |
+| **Quản lý tài xế** | Quản lý hồ sơ tài xế, trạng thái sẵn sàng nhận chuyến và thông tin phương tiện. |
+| **Quản lý phương tiện** | Lưu trữ và quản lý thông tin cơ bản của phương tiện. |
+| **Đặt xe** | Customer nhập điểm đón, điểm đến và lựa chọn loại xe để tạo yêu cầu đặt xe. |
+| **Tìm tài xế** | Hệ thống tìm tài xế phù hợp dựa trên trạng thái sẵn sàng, loại xe và khoảng cách đến điểm đón. |
+| **Phân công tài xế** | Gửi yêu cầu đến tài xế; nếu tài xế từ chối hoặc không phản hồi thì tìm tài xế tiếp theo. |
+| **Quản lý chuyến đi** | Theo dõi và cập nhật trạng thái từ khi tạo booking đến khi hoàn thành chuyến. |
+| **Theo dõi vị trí** | Cập nhật vị trí tài xế ở mức cơ bản để hỗ trợ theo dõi chuyến. |
+| **Tính cước** | Tính số tiền khách hàng phải trả dựa trên loại xe và thông tin chuyến theo công thức cước cơ bản. |
+| **Thanh toán** | Hỗ trợ thanh toán tiền mặt và một phương thức thanh toán điện tử. |
+| **Thông báo** | Gửi thông báo cho Customer/Driver về các sự kiện quan trọng của booking và trip. |
+| **Lịch sử chuyến** | Customer và Driver có thể xem các chuyến đã thực hiện. |
+| **Đánh giá** | Customer có thể đánh giá Driver sau khi hoàn thành chuyến. |
+| **Quản lý vận hành** | Operation có thể xem Customer, Driver, Trip và trạng thái chuyến đang diễn ra. |
+| **Phân quyền** | Phân quyền cơ bản cho Customer, Driver, Operation và Admin. |
+| **Audit Log** | Lưu vết các thao tác quản trị quan trọng. |
+
+---
+
+### 3. Quy trình nghiệp vụ cốt lõi
+
+MVP phải hoàn thành được quy trình end-to-end sau:
 
 ```text
 Customer Login
       ↓
-Nhập Pickup & Destination
+Nhập điểm đón / điểm đến
       ↓
 Chọn loại xe
       ↓
 Tạo Booking
       ↓
-Booking được tiếp nhận
-      ↓
-Tìm Driver
+Hệ thống tìm Driver
       ↓
 Driver nhận chuyến
       ↓
@@ -151,7 +184,7 @@ Driver đến điểm đón
       ↓
 Đón khách
       ↓
-Đang thực hiện chuyến
+Thực hiện chuyến
       ↓
 Hoàn thành chuyến
       ↓
@@ -159,44 +192,4 @@ Tính cước
       ↓
 Thanh toán
       ↓
-Đánh giá Driver
-```text
-Booking
-   ↓
-Find Available Drivers
-   ↓
-Filter Vehicle Type
-   ↓
-Sort by Distance
-   ↓
-Select Driver
-   ↓
-Send Trip Request
-   ↓
- ┌───────────────┐
- │               │
-Accept         Reject/Timeout
- │               │
- ↓               ↓
-Assign       Next Driver
-Driver           │
-                 ↓
-            No Driver
-                 ↓
-          Notify Customer
-
-REQUESTED
-    ↓
-SEARCHING_DRIVER
-    ↓
-DRIVER_ASSIGNED
-    ↓
-DRIVER_ARRIVING
-    ↓
-DRIVER_ARRIVED
-    ↓
-PASSENGER_PICKED_UP
-    ↓
-IN_PROGRESS
-    ↓
-COMPLETED
+Customer đánh giá Driver
