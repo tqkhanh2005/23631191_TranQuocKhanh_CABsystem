@@ -343,11 +343,6 @@ Sau khi MVP hoàn thành, doanh nghiệp có thể chuyển từ mô hình đặ
 
 **Customer tạo yêu cầu → CAB tự động tìm Driver → Driver nhận và thực hiện chuyến → CAB theo dõi Trip → Tính cước → Thanh toán → Hoàn thành**
 
-Đúng hướng rồi. Với mục **“Phân rã yêu cầu chức năng”**, BA nên đi từ **Functional Requirement cấp cao → các Functional Requirement cấp thấp**, để sau này có thể tiếp tục chuyển thành **Use Case, User Story, Acceptance Criteria và Test Case**.
-
-Bạn có thể copy trực tiếp phần dưới vào `README.md`:
-
-````markdown
 ## 5. Phân rã yêu cầu chức năng
 
 Yêu cầu chức năng được phân rã từ các nghiệp vụ cốt lõi của CAB System thành các chức năng nhỏ hơn, có thể phát triển, kiểm thử và nghiệm thu độc lập.
