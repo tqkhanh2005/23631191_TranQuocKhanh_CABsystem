@@ -1236,3 +1236,429 @@ Có thể tóm tắt toàn bộ nghiệp vụ MVP bằng chuỗi:
 **Book → Match → Assign → Pickup → Ride → Complete → Fare → Pay → Rate**
 
 Đây là **Core Business Process** mà BA cần ưu tiên phân tích, thiết kế và nghiệm thu trong phạm vi 7 tuần.
+
+# 10. Phân tích Business Rules
+
+## 10.1. Tổng quan
+
+Business Rule là các quy định, điều kiện hoặc nguyên tắc mà CAB System phải tuân thủ trong quá trình vận hành nghiệp vụ.
+
+Các Business Rule được xác định nhằm đảm bảo hệ thống xử lý thống nhất đối với các nghiệp vụ chính như:
+
+- Quản lý Customer và Driver
+- Đặt xe
+- Tìm và phân công Driver
+- Quản lý trạng thái Trip
+- Tính cước
+- Thanh toán
+- Hủy chuyến
+- Thông báo
+- Đánh giá
+- Phân quyền vận hành
+
+> **Lưu ý:** Một số quy tắc trong yêu cầu hiện tại chưa được Business Owner chốt. BA cần đưa các quy tắc này vào danh sách **Open Business Rules** để xác nhận trước khi Development triển khai.
+
+---
+
+## 10.2. Business Rules - Account & Access
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-01 | Authentication Required | Customer, Driver và Staff phải đăng nhập trước khi sử dụng các chức năng yêu cầu tài khoản. | Must Have |
+| BR-02 | Role-based Access | Người dùng chỉ được phép truy cập các chức năng phù hợp với Role của mình. | Must Have |
+| BR-03 | Account Status | Tài khoản bị khóa/disabled không được phép đăng nhập hoặc thực hiện nghiệp vụ. | Must Have |
+| BR-04 | Unique Account | Thông tin định danh tài khoản phải là duy nhất theo quy định doanh nghiệp. | Must Have |
+| BR-05 | Admin Permission | Chỉ người dùng có quyền Admin mới được thực hiện các thao tác quản trị nhạy cảm. | Must Have |
+
+---
+
+# 10.3. Business Rules - Customer
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-06 | Customer Identity | Mỗi Customer được xác định bởi một tài khoản duy nhất. | Must Have |
+| BR-07 | Booking Permission | Customer chỉ được tạo Booking khi tài khoản đang ở trạng thái hợp lệ. | Must Have |
+| BR-08 | Booking Information | Booking phải có tối thiểu Pickup Location, Destination và Vehicle Type. | Must Have |
+| BR-09 | Active Booking | Customer không được tạo nhiều Booking Active cùng thời điểm nếu doanh nghiệp không cho phép. | Should Have |
+| BR-10 | Trip History | Customer chỉ được xem lịch sử Trip của chính mình. | Must Have |
+
+---
+
+# 10.4. Business Rules - Booking
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-11 | Valid Pickup | Pickup Location phải là vị trí hợp lệ mà dịch vụ CAB hỗ trợ. | Must Have |
+| BR-12 | Valid Destination | Destination phải hợp lệ và thuộc phạm vi dịch vụ. | Must Have |
+| BR-13 | Vehicle Type | Vehicle Type phải tồn tại và đang được doanh nghiệp cung cấp. | Must Have |
+| BR-14 | Booking Status | Booking phải tuân thủ State Transition được định nghĩa. | Must Have |
+| BR-15 | Booking Confirmation | Booking chỉ được xem là hợp lệ sau khi hệ thống ghi nhận thành công. | Must Have |
+| BR-16 | Cancellation Policy | Booking chỉ được hủy tại các trạng thái được doanh nghiệp cho phép. | Must Have |
+
+---
+
+# 10.5. Booking State Transition
+
+Trạng thái Booking/Trip cần được kiểm soát để tránh việc cập nhật trạng thái không hợp lệ.
+
+```mermaid
+stateDiagram-v2
+
+    [*] --> SEARCHING_DRIVER
+
+    SEARCHING_DRIVER --> DRIVER_ASSIGNED: Driver Accept
+    SEARCHING_DRIVER --> NO_DRIVER_FOUND: No Driver
+    SEARCHING_DRIVER --> CANCELLED: Customer Cancel
+
+    DRIVER_ASSIGNED --> DRIVER_ARRIVING
+    DRIVER_ASSIGNED --> CANCELLED
+
+    DRIVER_ARRIVING --> DRIVER_ARRIVED
+    DRIVER_ARRIVING --> CANCELLED
+
+    DRIVER_ARRIVED --> PASSENGER_PICKED_UP
+
+    PASSENGER_PICKED_UP --> IN_PROGRESS
+
+    IN_PROGRESS --> COMPLETED
+
+    COMPLETED --> PAYMENT_PENDING
+
+    PAYMENT_PENDING --> PAYMENT_SUCCESS
+    PAYMENT_PENDING --> PAYMENT_FAILED
+
+    PAYMENT_FAILED --> PAYMENT_PENDING: Retry
+
+    PAYMENT_SUCCESS --> RATED
+    RATED --> [*]
+
+    NO_DRIVER_FOUND --> [*]
+    CANCELLED --> [*]
+```
+
+### Rule
+
+**BR-17 - Valid State Transition**
+
+Hệ thống không cho phép chuyển trực tiếp từ một trạng thái sang trạng thái không hợp lệ.
+
+Ví dụ:
+
+```text
+SEARCHING_DRIVER
+       ↓
+DRIVER_ASSIGNED
+       ↓
+DRIVER_ARRIVING
+       ↓
+DRIVER_ARRIVED
+       ↓
+PASSENGER_PICKED_UP
+       ↓
+IN_PROGRESS
+       ↓
+COMPLETED
+```
+
+Không cho phép:
+
+```text
+SEARCHING_DRIVER → COMPLETED
+DRIVER_ASSIGNED → PAYMENT_SUCCESS
+COMPLETED → DRIVER_ARRIVING
+```
+
+---
+
+# 10.6. Business Rules - Driver
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-18 | Driver Availability | Driver chỉ được nhận Booking khi ở trạng thái `AVAILABLE`. | Must Have |
+| BR-19 | Vehicle Validity | Driver phải có phương tiện hợp lệ để nhận chuyến. | Must Have |
+| BR-20 | Vehicle Matching | Driver phải có loại xe phù hợp với Vehicle Type Customer yêu cầu. | Must Have |
+| BR-21 | One Active Trip | Một Driver không được đồng thời nhận nhiều Trip Active nếu doanh nghiệp không cho phép. | Must Have |
+| BR-22 | Location Required | Driver cần cung cấp thông tin vị trí để hệ thống hỗ trợ Matching. | Should Have |
+| BR-23 | Driver Status | Driver phải cập nhật trạng thái hoạt động phù hợp với tình trạng thực tế. | Must Have |
+
+---
+
+# 10.7. Business Rules - Driver Matching
+
+Đây là nhóm Business Rules quan trọng nhất của CAB System.
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-24 | Available Driver Only | Chỉ Driver đang `AVAILABLE` mới được đưa vào danh sách Matching. | Must Have |
+| BR-25 | Vehicle Compatibility | Driver phải có Vehicle Type phù hợp với Booking. | Must Have |
+| BR-26 | Location Proximity | Driver gần Pickup Location được ưu tiên hơn. | Must Have |
+| BR-27 | Driver Ranking | Hệ thống phải xếp hạng Driver dựa trên các tiêu chí được Business Owner xác nhận. | Must Have |
+| BR-28 | Driver Timeout | Nếu Driver không phản hồi trong thời gian quy định, hệ thống phải chuyển sang Driver khác. | Must Have |
+| BR-29 | Driver Reject | Nếu Driver từ chối, Driver đó không được tiếp tục nhận cùng Booking trong lần Matching hiện tại. | Must Have |
+| BR-30 | Sequential Matching | Hệ thống tiếp tục tìm Driver khác nếu Driver hiện tại Reject/Timeout. | Must Have |
+| BR-31 | Matching Limit | Hệ thống phải có giới hạn số lần thử Matching để tránh vòng lặp vô hạn. | Should Have |
+| BR-32 | No Driver Found | Nếu không còn Driver phù hợp, Booking chuyển sang `NO_DRIVER_FOUND`. | Must Have |
+
+### Matching Flow
+
+```mermaid
+flowchart TD
+
+    A["New Booking"]
+    B["Find AVAILABLE Drivers"]
+    C["Filter Vehicle Type"]
+    D["Filter by Location"]
+    E["Rank Drivers"]
+    F["Select Best Driver"]
+    G["Send Trip Request"]
+    H{"Driver Response?"}
+
+    I["Assign Driver"]
+    J["Driver Reject"]
+    K["Driver Timeout"]
+    L{"Another Driver Available?"}
+    M["No Driver Found"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+
+    H -- "Accept" --> I
+    H -- "Reject" --> J
+    H -- "Timeout" --> K
+
+    J --> L
+    K --> L
+
+    L -- "Yes" --> B
+    L -- "No" --> M
+```
+
+---
+
+# 10.8. Business Rules - Fare
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-33 | Fare Calculation | Fare phải được tính dựa trên Fare Rule do doanh nghiệp cấu hình. | Must Have |
+| BR-34 | Vehicle Pricing | Mỗi Vehicle Type có thể có mức giá khác nhau. | Must Have |
+| BR-35 | Fare Finalization | Fare cuối cùng được xác định khi Trip hoàn thành theo chính sách doanh nghiệp. | Must Have |
+| BR-36 | Fare Transparency | Customer phải có thể xem số tiền phải thanh toán. | Must Have |
+| BR-37 | Fare Consistency | Fare đã hoàn tất không được tự ý thay đổi nếu không có quyền nghiệp vụ phù hợp. | Must Have |
+
+### Các vấn đề cần Business Owner xác nhận
+
+- Giá mở cửa là bao nhiêu?
+- Giá theo km?
+- Giá theo thời gian?
+- Có phụ phí giờ cao điểm không?
+- Có phụ phí theo khu vực không?
+- Có khuyến mãi/discount không?
+- Fare được tính trước hay sau chuyến?
+- Có quy định làm tròn số tiền không?
+
+---
+
+# 10.9. Business Rules - Payment
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-38 | Supported Payment Method | Hệ thống hỗ trợ Cash và Electronic Payment. | Must Have |
+| BR-39 | External Payment Provider | Electronic Payment phải được xử lý thông qua Payment Provider bên ngoài. | Must Have |
+| BR-40 | Sensitive Data | CAB không lưu trực tiếp thông tin nhạy cảm của thẻ/tài khoản thanh toán. | Must Have |
+| BR-41 | Payment Status | Mỗi Payment phải có trạng thái rõ ràng. | Must Have |
+| BR-42 | Payment Failure | Payment Failed phải được ghi nhận và thông báo Customer. | Must Have |
+| BR-43 | Payment Retry | Customer có thể Retry Payment theo chính sách doanh nghiệp. | Must Have |
+| BR-44 | Duplicate Payment | Hệ thống phải hạn chế việc một Trip bị thanh toán thành công nhiều lần. | Must Have |
+
+### Payment State
+
+```mermaid
+stateDiagram-v2
+
+    [*] --> PENDING
+
+    PENDING --> SUCCESS
+    PENDING --> FAILED
+
+    FAILED --> PENDING: Retry
+
+    SUCCESS --> [*]
+```
+
+---
+
+# 10.10. Business Rules - Cancellation
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-45 | Customer Cancellation | Customer chỉ được hủy Trip tại các trạng thái được cho phép. | Must Have |
+| BR-46 | Driver Cancellation | Driver chỉ được hủy theo chính sách doanh nghiệp. | Must Have |
+| BR-47 | Cancellation Fee | Hệ thống phải áp dụng phí hủy nếu chính sách doanh nghiệp quy định. | Should Have |
+| BR-48 | Cancellation Record | Mọi lần hủy phải được lưu lý do và Actor thực hiện. | Must Have |
+
+### Cần xác nhận
+
+- Customer được hủy ở trạng thái nào?
+- Driver được hủy ở trạng thái nào?
+- Khi nào phát sinh phí hủy?
+- Phí hủy tính bao nhiêu?
+- Có giới hạn số lần hủy không?
+- Driver hủy nhiều lần có bị ảnh hưởng không?
+
+---
+
+# 10.11. Business Rules - Notification
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-49 | Booking Notification | Customer nhận thông báo khi Booking được tiếp nhận. | Must Have |
+| BR-50 | Driver Assignment Notification | Customer nhận thông báo khi Driver được phân công. | Must Have |
+| BR-51 | Driver Arrival Notification | Customer nhận thông báo khi Driver đến điểm đón. | Must Have |
+| BR-52 | Trip Completion Notification | Customer nhận thông báo khi Trip hoàn thành. | Must Have |
+| BR-53 | Payment Notification | Customer nhận kết quả thanh toán. | Must Have |
+| BR-54 | Driver Trip Notification | Driver nhận thông báo khi có Trip phù hợp. | Must Have |
+| BR-55 | Notification Retry | Hệ thống có thể Retry khi Notification Provider gặp lỗi tạm thời. | Should Have |
+| BR-56 | Notification Extensibility | Có thể bổ sung thêm Notification Channel trong tương lai. | Should Have |
+
+---
+
+# 10.12. Business Rules - Rating
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-57 | Completed Trip Only | Customer chỉ được đánh giá sau khi Trip hoàn thành. | Must Have |
+| BR-58 | One Rating per Trip | Một Customer chỉ được đánh giá một lần cho một Trip. | Must Have |
+| BR-59 | Rating Range | Rating phải nằm trong khoảng điểm được doanh nghiệp quy định. | Must Have |
+| BR-60 | Rating Ownership | Customer chỉ được đánh giá Driver của Trip tương ứng. | Must Have |
+
+---
+
+# 10.13. Business Rules - Operation & Permission
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-61 | Role Permission | Mỗi Staff Role có tập quyền riêng. | Must Have |
+| BR-62 | Sensitive Action | Các thao tác nhạy cảm chỉ dành cho Role được cấp quyền. | Must Have |
+| BR-63 | Trip Monitoring | Operation được xem các Trip theo phạm vi quyền hạn. | Must Have |
+| BR-64 | Customer Management | Staff có quyền phù hợp mới được thay đổi thông tin Customer. | Must Have |
+| BR-65 | Driver Management | Staff có quyền phù hợp mới được quản lý Driver. | Must Have |
+| BR-66 | Audit Sensitive Action | Các thao tác nhạy cảm phải được ghi Audit Log. | Must Have |
+
+---
+
+# 10.14. Business Rules - Location
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-67 | Location Permission | Hệ thống chỉ lấy vị trí khi người dùng cấp quyền cần thiết. | Must Have |
+| BR-68 | Driver Location | Driver cần chia sẻ vị trí khi đang Available/Active Trip theo chính sách. | Should Have |
+| BR-69 | Location Accuracy | Hệ thống cần xác định mức độ chính xác tối thiểu của vị trí trước khi sử dụng. | Should Have |
+| BR-70 | Location Privacy | Dữ liệu vị trí phải được bảo vệ và chỉ sử dụng cho mục đích nghiệp vụ được phép. | Must Have |
+
+---
+
+# 10.15. Business Rules - Audit & Data
+
+| ID | Business Rule | Mô tả | Priority |
+|---|---|---|---|
+| BR-71 | Audit Critical Action | Các thao tác quan trọng phải được ghi nhận. | Must Have |
+| BR-72 | Audit Actor | Audit Log phải xác định được ai thực hiện thao tác. | Must Have |
+| BR-73 | Audit Timestamp | Audit Log phải lưu thời gian thực hiện. | Must Have |
+| BR-74 | Data Retention | Dữ liệu phải được lưu theo thời gian lưu trữ do doanh nghiệp quy định. | Should Have |
+| BR-75 | Data Access | Chỉ người dùng có quyền mới được truy cập dữ liệu nhạy cảm. | Must Have |
+
+---
+
+# 10.16. Ma trận Business Rule quan trọng
+
+| Business Area | Các Rule quan trọng nhất |
+|---|---|
+| **Booking** | BR-08, BR-11, BR-12, BR-14, BR-16 |
+| **Driver Matching** | BR-24 → BR-32 |
+| **Trip** | BR-17, BR-18, BR-21 |
+| **Fare** | BR-33 → BR-37 |
+| **Payment** | BR-38 → BR-44 |
+| **Cancellation** | BR-45 → BR-48 |
+| **Notification** | BR-49 → BR-56 |
+| **Rating** | BR-57 → BR-60 |
+| **Operation** | BR-61 → BR-66 |
+| **Location** | BR-67 → BR-70 |
+| **Audit & Security** | BR-71 → BR-75 |
+
+---
+
+# 10.17. Open Business Rules
+
+Đây là những Business Rule **chưa đủ thông tin để BA tự quyết định** và cần đưa ra trao đổi với Business Owner/Stakeholder.
+
+| ID | Vấn đề cần xác nhận | Stakeholder cần xác nhận |
+|---|---|---|
+| OBR-01 | Công thức tính Fare | Business Owner / Finance |
+| OBR-02 | Tiêu chí ưu tiên Driver | Operation |
+| OBR-03 | Driver Response Timeout | Operation |
+| OBR-04 | Search Radius | Operation |
+| OBR-05 | Số lần Retry Matching | Operation |
+| OBR-06 | Cancellation Policy | Business Owner / Operation |
+| OBR-07 | Cancellation Fee | Business Owner / Finance |
+| OBR-08 | Payment Retry Policy | Finance |
+| OBR-09 | GPS Failure Policy | Operation / IT |
+| OBR-10 | Data Retention Period | Business / Legal / IT |
+| OBR-11 | Rating Policy | Business Owner |
+| OBR-12 | Staff Permission Matrix | Business Owner / Operation |
+| OBR-13 | Notification Retry Policy | IT / Operation |
+
+---
+
+# 10.18. Business Rules ưu tiên cho MVP 7 tuần
+
+Trong phạm vi 7 tuần, các Business Rules cần chốt trước khi Development triển khai gồm:
+
+1. **Booking Rule**
+2. **Driver Availability Rule**
+3. **Driver Matching Rule**
+4. **Driver Timeout Rule**
+5. **Driver Reject Rule**
+6. **No Driver Found Rule**
+7. **Trip State Transition Rule**
+8. **Fare Calculation Rule**
+9. **Payment Rule**
+10. **Payment Failure / Retry Rule**
+11. **Cancellation Rule**
+12. **Role & Permission Rule**
+
+Đây là các Rule có ảnh hưởng trực tiếp đến **Core Business Process**:
+
+```text
+Create Booking
+      ↓
+Find Driver
+      ↓
+Assign Driver
+      ↓
+Execute Trip
+      ↓
+Calculate Fare
+      ↓
+Payment
+      ↓
+Complete
+```
+
+Nếu các Rule trên chưa được Business Owner xác nhận, Development có nguy cơ phải thay đổi logic trong quá trình triển khai.
+
+---
+
+## 10.19. Kết luận phân tích Business Rule
+
+Business Rules của CAB System không chỉ là các điều kiện kiểm tra dữ liệu mà còn quyết định cách hệ thống vận hành trong các tình huống thực tế.
+
+Đặc biệt, **Driver Matching, Trip State, Fare, Payment và Cancellation** là các nhóm Rule có tính chất nghiệp vụ cao và cần được BA làm rõ với Business Owner trước khi chuyển thành Functional Requirement.
+
+Các Rule chưa được xác định rõ cần được quản lý dưới dạng **Open Business Rules** thay vì tự giả định. Sau khi được Stakeholder xác nhận, BA có thể chuyển tiếp thành:
+
+**Business Rule → Functional Requirement → Use Case → User Story → Acceptance Criteria → Test Case**
