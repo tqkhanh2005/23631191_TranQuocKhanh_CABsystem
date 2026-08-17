@@ -193,3 +193,134 @@ Tính cước
 Thanh toán
       ↓
 Customer đánh giá Driver
+```
+
+Được. Với vai trò **BA**, khi chuyển từ đề bài của khách hàng sang **Business Requirements (BR)**, cần tập trung vào **doanh nghiệp cần đạt được điều gì**, thay vì mô tả hệ thống phải code như thế nào.
+
+Với phạm vi **MVP 7 tuần**, tôi đề xuất chuẩn hóa Business Requirements như sau:
+
+```markdown
+## Business Requirements
+
+### 1. Mục tiêu
+
+Business Requirements mô tả các nhu cầu và mục tiêu ở cấp độ nghiệp vụ mà CAB System cần đáp ứng. Các yêu cầu dưới đây được xây dựng dựa trên mục tiêu của doanh nghiệp và phạm vi MVP trong 7 tuần.
+
+---
+
+### 2. Danh sách Business Requirements
+
+| ID | Business Requirement | Priority |
+|---|---|---|
+| **BR-01** | Doanh nghiệp cần cung cấp một nền tảng đặt xe trực tuyến cho phép khách hàng tạo và quản lý yêu cầu đặt xe mà không cần phụ thuộc vào tổng đài hoặc thao tác thủ công. | Must Have |
+| **BR-02** | Doanh nghiệp cần quản lý tập trung thông tin khách hàng, tài xế và phương tiện để hỗ trợ hoạt động vận hành dịch vụ. | Must Have |
+| **BR-03** | Doanh nghiệp cần tự động hóa quá trình tìm kiếm và phân công tài xế phù hợp cho các yêu cầu đặt xe. | Must Have |
+| **BR-04** | Doanh nghiệp cần đảm bảo khi tài xế từ chối hoặc không phản hồi, hệ thống có thể tiếp tục tìm tài xế khác mà không yêu cầu khách hàng tạo lại yêu cầu. | Must Have |
+| **BR-05** | Doanh nghiệp cần cung cấp khả năng theo dõi vòng đời chuyến đi từ khi khách hàng tạo yêu cầu đến khi chuyến được hoàn thành. | Must Have |
+| **BR-06** | Doanh nghiệp cần cung cấp thông tin về tài xế và trạng thái chuyến để khách hàng có thể chủ động theo dõi quá trình sử dụng dịch vụ. | Must Have |
+| **BR-07** | Doanh nghiệp cần sử dụng thông tin vị trí tài xế để hỗ trợ việc lựa chọn tài xế phù hợp và cung cấp thời gian dự kiến tài xế đến cho khách hàng. | Should Have |
+| **BR-08** | Doanh nghiệp cần có cơ chế xác định số tiền khách hàng phải trả dựa trên loại dịch vụ và thông tin của chuyến đi. | Must Have |
+| **BR-09** | Doanh nghiệp cần hỗ trợ khách hàng thanh toán bằng tiền mặt và ít nhất một phương thức thanh toán điện tử. | Must Have |
+| **BR-10** | Doanh nghiệp cần tích hợp với nhà cung cấp thanh toán bên ngoài nhưng không lưu trữ trực tiếp thông tin nhạy cảm của thẻ hoặc tài khoản thanh toán trong hệ thống CAB. | Must Have |
+| **BR-11** | Doanh nghiệp cần có khả năng nhận biết và xử lý các trường hợp thanh toán không thành công, đồng thời thông báo cho khách hàng theo chính sách được thống nhất. | Must Have |
+| **BR-12** | Doanh nghiệp cần cung cấp cơ chế thông báo cho khách hàng và tài xế khi xảy ra các sự kiện quan trọng trong quá trình đặt và thực hiện chuyến. | Must Have |
+| **BR-13** | Doanh nghiệp cần thiết kế cơ chế thông báo có khả năng mở rộng để có thể bổ sung các kênh hoặc nhà cung cấp thông báo trong tương lai. | Should Have |
+| **BR-14** | Doanh nghiệp cần cho phép khách hàng xem lại lịch sử chuyến đi và thông tin chi phí của các chuyến đã hoàn thành. | Should Have |
+| **BR-15** | Doanh nghiệp cần cho phép khách hàng đánh giá tài xế sau khi chuyến đi hoàn thành nhằm thu thập phản hồi về chất lượng dịch vụ. | Should Have |
+| **BR-16** | Doanh nghiệp cần cung cấp cho nhân viên vận hành khả năng theo dõi các chuyến đang diễn ra và trạng thái hoạt động của tài xế. | Must Have |
+| **BR-17** | Doanh nghiệp cần cho phép nhân viên vận hành tra cứu và hỗ trợ xử lý các trường hợp chuyến đi hoặc thanh toán gặp vấn đề. | Must Have |
+| **BR-18** | Doanh nghiệp cần áp dụng cơ chế phân quyền để đảm bảo nhân viên chỉ có thể thực hiện các nghiệp vụ phù hợp với vai trò được cấp. | Must Have |
+| **BR-19** | Doanh nghiệp cần lưu vết các thao tác quan trọng trên hệ thống để phục vụ kiểm tra, truy vết và điều tra khi xảy ra sự cố. | Should Have |
+| **BR-20** | Doanh nghiệp cần có các báo cáo cơ bản về số lượng chuyến, doanh thu, tỷ lệ hoàn thành, tỷ lệ hủy và hiệu quả hoạt động của tài xế. | Should Have |
+| **BR-21** | Doanh nghiệp cần đảm bảo lỗi của một thành phần phụ trợ như thanh toán hoặc thông báo không làm gián đoạn toàn bộ quy trình đặt và thực hiện chuyến. | Must Have |
+| **BR-22** | Doanh nghiệp cần xây dựng hệ thống có khả năng mở rộng khi số lượng khách hàng, tài xế và chuyến đi tăng lên. | Must Have |
+| **BR-23** | Doanh nghiệp cần có khả năng triển khai hoặc thay đổi từng thành phần của hệ thống với mức ảnh hưởng tối thiểu đến các chức năng đang hoạt động. | Should Have |
+| **BR-24** | Doanh nghiệp cần bảo vệ thông tin cá nhân, thông tin phương tiện, dữ liệu vị trí và dữ liệu giao dịch của người dùng. | Must Have |
+| **BR-25** | Doanh nghiệp cần xác định và thống nhất các quy tắc nghiệp vụ về tính cước, driver matching, thời gian phản hồi, hủy chuyến, thanh toán và lưu trữ dữ liệu trước khi triển khai chính thức. | Must Have |
+| **BR-26** | Doanh nghiệp cần xây dựng nền tảng có khả năng mở rộng để bổ sung loại dịch vụ, phương thức thanh toán và nhà cung cấp dịch vụ bên ngoài trong tương lai. | Should Have |
+
+---
+
+### 3. Business Requirements theo nhóm nghiệp vụ
+
+#### 3.1. Customer & Booking
+
+- **BR-01:** Cung cấp nền tảng đặt xe trực tuyến.
+- **BR-02:** Quản lý thông tin khách hàng tập trung.
+- **BR-05:** Theo dõi vòng đời chuyến đi.
+- **BR-06:** Cung cấp thông tin tài xế và trạng thái chuyến.
+- **BR-14:** Quản lý lịch sử chuyến.
+- **BR-15:** Thu thập đánh giá tài xế.
+
+#### 3.2. Driver & Dispatch
+
+- **BR-02:** Quản lý thông tin tài xế/phương tiện.
+- **BR-03:** Tự động tìm và phân công tài xế.
+- **BR-04:** Tự động tìm tài xế thay thế khi Driver Reject/Timeout.
+- **BR-07:** Sử dụng dữ liệu vị trí để hỗ trợ matching và ETA.
+
+#### 3.3. Fare & Payment
+
+- **BR-08:** Tính cước.
+- **BR-09:** Hỗ trợ Cash và Electronic Payment.
+- **BR-10:** Tích hợp Payment Provider bên ngoài.
+- **BR-11:** Xử lý Payment Failure.
+
+#### 3.4. Notification
+
+- **BR-12:** Thông báo các sự kiện quan trọng.
+- **BR-13:** Cho phép mở rộng Notification Channel/Provider.
+
+#### 3.5. Operation
+
+- **BR-16:** Theo dõi Trip và Driver.
+- **BR-17:** Hỗ trợ xử lý Exception.
+- **BR-18:** Phân quyền.
+- **BR-19:** Audit Log.
+- **BR-20:** Báo cáo vận hành.
+
+#### 3.6. Security & Architecture
+
+- **BR-21:** Không để lỗi Payment/Notification làm gián đoạn toàn hệ thống.
+- **BR-22:** Có khả năng mở rộng.
+- **BR-23:** Hỗ trợ triển khai từng phần.
+- **BR-24:** Bảo vệ dữ liệu.
+- **BR-26:** Có khả năng mở rộng nghiệp vụ trong tương lai.
+
+---
+
+### 4. Business Rules cần xác nhận
+
+Một số Business Requirements chưa thể chuyển thành Functional Requirements cụ thể nếu doanh nghiệp chưa thống nhất Business Rules. BA cần xác nhận:
+
+| ID | Business Rule cần xác nhận |
+|---|---|
+| **BR-R01** | Công thức tính cước và các thành phần cấu thành giá. |
+| **BR-R02** | Tiêu chí lựa chọn và ưu tiên tài xế. |
+| **BR-R03** | Khoảng cách/bán kính tìm kiếm tài xế. |
+| **BR-R04** | Thời gian tài xế được phép phản hồi booking. |
+| **BR-R05** | Số lần hệ thống retry tìm tài xế. |
+| **BR-R06** | Chính sách hủy chuyến và phí hủy. |
+| **BR-R07** | Chính sách xử lý khi mất kết nối mạng/GPS. |
+| **BR-R08** | Chính sách retry khi thanh toán thất bại. |
+| **BR-R09** | Thời gian lưu trữ dữ liệu chuyến, vị trí, giao dịch và audit log. |
+| **BR-R10** | Quyền hạn cụ thể của từng nhóm nhân viên vận hành. |
+
+---
+
+### 5. Business Requirement ưu tiên cho MVP 7 tuần
+
+Để đảm bảo khả năng hoàn thành trong 7 tuần, các Business Requirements cốt lõi cần ưu tiên là:
+
+**BR-01 → BR-03 → BR-04 → BR-05 → BR-06 → BR-08 → BR-09 → BR-10 → BR-11 → BR-12 → BR-16 → BR-17 → BR-18 → BR-21 → BR-22 → BR-24 → BR-25**
+
+Các yêu cầu còn lại có thể được triển khai ở mức đơn giản trong MVP hoặc đưa sang Phase 2 tùy nguồn lực và mức độ ưu tiên của Business Owner.
+
+### 6. Business Outcome mong đợi
+
+Sau khi MVP hoàn thành, doanh nghiệp có thể chuyển từ mô hình đặt xe phụ thuộc nhiều vào thao tác thủ công sang một quy trình số hóa:
+
+**Customer tạo yêu cầu → CAB tự động tìm Driver → Driver nhận và thực hiện chuyến → CAB theo dõi Trip → Tính cước → Thanh toán → Hoàn thành**
+
+Qua đó doanh nghiệp có nền tảng cơ bản để tiếp tục mở rộng quy mô khách hàng, tài xế và các dịch vụ CAB trong các giai đoạn tiếp theo.
+```
