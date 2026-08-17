@@ -54,10 +54,32 @@ Ma trận các bên liên quan được phân loại dựa trên hai tiêu chí:
 - **Power:** Mức độ quyền lực/ảnh hưởng của stakeholder đối với dự án.
 - **Interest:** Mức độ quan tâm của stakeholder đối với hệ thống CAB.
 
-|  | **Interest thấp** | **Interest cao** |
-|---|---|---|
-| **Power cao** | **KEEP SATISFIED**<br><br>- System Admin<br>- IT / DevOps<br>- Security / Compliance | **MANAGE CLOSELY**<br><br>- Business Owner / Ban lãnh đạo<br>- Operation Manager<br>- Finance / Accounting |
-| **Power thấp** | **MONITOR**<br><br>- Notification Provider | **KEEP INFORMED / ENGAGE**<br><br>- Customer<br>- Driver<br>- Customer Support<br>- Fleet Management<br>- Payment Provider<br>- Map / GPS Provider |
+quadrantChart
+    title CAB System - Stakeholder Power Interest Matrix
+    x-axis "Interest thấp" --> "Interest cao"
+    y-axis "Power thấp" --> "Power cao"
+
+    quadrant-1 "MANAGE CLOSELY"
+    quadrant-2 "KEEP SATISFIED"
+    quadrant-3 "MONITOR"
+    quadrant-4 "KEEP INFORMED / ENGAGE"
+
+    "Business Owner": [0.88, 0.92]
+    "Operation": [0.85, 0.88]
+    "Finance": [0.78, 0.70]
+
+    "System Admin": [0.45, 0.82]
+    "IT / DevOps": [0.42, 0.78]
+    "Security / Compliance": [0.38, 0.82]
+
+    "Customer": [0.92, 0.30]
+    "Driver": [0.88, 0.45]
+    "Customer Support": [0.78, 0.42]
+    "Fleet Management": [0.72, 0.48]
+
+    "Notification Provider": [0.30, 0.20]
+    "Payment Provider": [0.55, 0.45]
+    "Map / GPS Provider": [0.50, 0.38]
 
 ### Chiến lược quản lý
 
