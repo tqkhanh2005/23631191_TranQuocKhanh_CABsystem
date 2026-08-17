@@ -49,11 +49,7 @@ Stakeholder Matrix được sử dụng để đánh giá các bên liên quan d
 
 ## Ma trận các bên liên quan
 
-Ma trận các bên liên quan được phân loại dựa trên hai tiêu chí:
-
-- **Power:** Mức độ quyền lực/ảnh hưởng của stakeholder đối với dự án.
-- **Interest:** Mức độ quan tâm của stakeholder đối với hệ thống CAB.
-
+```mermaid
 quadrantChart
     title CAB System - Stakeholder Power Interest Matrix
     x-axis "Interest thấp" --> "Interest cao"
