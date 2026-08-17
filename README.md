@@ -575,8 +575,664 @@ flowchart TD
 
 **Customer → Location → Booking → Driver Matching → Driver Acceptance → Trip → Fare → Payment → Notification → Rating**
 
-Đây là **Core Functional Scope** của CAB System. Các chức năng Reporting, Advanced Matching và các tính năng mở rộng có thể được triển khai ở mức cơ bản hoặc đưa sang Phase 2.
-````
+# 7. Use Case Diagram
 
+## 7.1. Các Actor chính
 
-Qua đó doanh nghiệp có nền tảng cơ bản để tiếp tục mở rộng quy mô khách hàng, tài xế và các dịch vụ CAB trong các giai đoạn tiếp theo.
+Hệ thống CAB có các Actor chính:
+
+- **Customer:** Khách hàng sử dụng dịch vụ đặt xe.
+- **Driver:** Tài xế nhận và thực hiện chuyến.
+- **Operation Staff:** Nhân viên vận hành theo dõi và hỗ trợ xử lý chuyến.
+- **Admin:** Quản trị viên hệ thống.
+- **Payment Provider:** Nhà cung cấp dịch vụ thanh toán bên ngoài.
+- **Map/GPS Service:** Dịch vụ bản đồ và định vị bên ngoài.
+- **Notification Provider:** Nhà cung cấp dịch vụ thông báo.
+
+## 7.2. Use Case Diagram
+
+```mermaid
+flowchart LR
+
+    Customer["Customer"]
+    Driver["Driver"]
+    Operation["Operation Staff"]
+    Admin["Admin"]
+    Payment["Payment Provider"]
+    Map["Map / GPS Service"]
+    Notify["Notification Provider"]
+
+    subgraph CAB["CAB System"]
+
+        UC01(("Register / Login"))
+        UC02(("Manage Profile"))
+
+        UC03(("Create Booking"))
+        UC04(("Track Booking"))
+        UC05(("Cancel Booking"))
+        UC06(("View Trip History"))
+        UC07(("Rate Driver"))
+
+        UC08(("Manage Driver Profile"))
+        UC09(("Manage Vehicle"))
+        UC10(("Set Driver Availability"))
+        UC11(("Receive Trip Request"))
+        UC12(("Accept / Reject Trip"))
+        UC13(("Update Trip Status"))
+        UC14(("Update Driver Location"))
+
+        UC15(("Find Available Drivers"))
+        UC16(("Assign Driver"))
+        UC17(("Calculate Fare"))
+
+        UC18(("Make Payment"))
+        UC19(("Process Payment"))
+        UC20(("Retry Payment"))
+
+        UC21(("Send Notification"))
+
+        UC22(("Monitor Trips"))
+        UC23(("Manage Customer"))
+        UC24(("Manage Driver"))
+        UC25(("Manage Vehicle"))
+        UC26(("Handle Exception"))
+        UC27(("View Transaction"))
+
+        UC28(("Manage Users & Roles"))
+        UC29(("View Reports"))
+        UC30(("Audit Log"))
+    end
+
+    Customer --> UC01
+    Customer --> UC02
+    Customer --> UC03
+    Customer --> UC04
+    Customer --> UC05
+    Customer --> UC06
+    Customer --> UC07
+    Customer --> UC18
+
+    Driver --> UC01
+    Driver --> UC02
+    Driver --> UC08
+    Driver --> UC09
+    Driver --> UC10
+    Driver --> UC11
+    Driver --> UC12
+    Driver --> UC13
+    Driver --> UC14
+
+    Operation --> UC22
+    Operation --> UC23
+    Operation --> UC24
+    Operation --> UC25
+    Operation --> UC26
+    Operation --> UC27
+    Operation --> UC29
+
+    Admin --> UC28
+    Admin --> UC29
+    Admin --> UC30
+
+    UC03 --> UC15
+    UC15 --> UC16
+    UC16 --> UC11
+    UC13 --> UC17
+    UC18 --> UC19
+    UC19 --> Payment
+    UC14 --> Map
+    UC03 --> Map
+    UC21 --> Notify
+
+    UC03 -.-> UC21
+    UC16 -.-> UC21
+    UC13 -.-> UC21
+    UC18 -.-> UC21
+```
+
+> **Lưu ý:** Diagram trên thể hiện phạm vi Use Case ở mức tổng quan. Khi phân tích chi tiết, các Use Case quan trọng như `Create Booking`, `Find Driver`, `Accept Trip`, `Complete Trip` và `Make Payment` sẽ được đặc tả riêng.
+
+---
+
+# 8. Đặc tả Use Case
+
+## 8.1. UC-01 - Đăng nhập
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-01 |
+| **Use Case Name** | Login |
+| **Primary Actor** | Customer / Driver / Operation / Admin |
+| **Goal** | Cho phép người dùng truy cập hệ thống theo đúng quyền được cấp. |
+| **Precondition** | Người dùng đã có tài khoản hợp lệ. |
+| **Trigger** | Người dùng nhập thông tin đăng nhập. |
+| **Postcondition** | Người dùng đăng nhập thành công và được cấp quyền tương ứng. |
+
+### Main Flow
+
+1. Người dùng mở màn hình Login.
+2. Nhập username/email và password.
+3. Hệ thống kiểm tra thông tin tài khoản.
+4. Hệ thống xác thực tài khoản.
+5. Hệ thống xác định Role của người dùng.
+6. Hệ thống tạo phiên đăng nhập.
+7. Hệ thống chuyển người dùng đến màn hình tương ứng.
+
+### Alternative Flow
+
+- **A1:** Sai username/password → hệ thống thông báo lỗi.
+- **A2:** Tài khoản bị khóa → hệ thống từ chối đăng nhập.
+- **A3:** Tài khoản không tồn tại → hệ thống thông báo tài khoản không hợp lệ.
+
+---
+
+# 8.2. UC-02 - Create Booking
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-02 |
+| **Use Case Name** | Create Booking |
+| **Primary Actor** | Customer |
+| **Goal** | Tạo yêu cầu đặt xe. |
+| **Precondition** | Customer đã đăng nhập. |
+| **Trigger** | Customer chọn chức năng đặt xe. |
+| **Postcondition** | Booking được tạo và chuyển sang trạng thái tìm Driver. |
+
+### Main Flow
+
+1. Customer chọn chức năng `Book a Ride`.
+2. Hệ thống yêu cầu điểm đón.
+3. Customer nhập/chọn điểm đón.
+4. Customer nhập/chọn điểm đến.
+5. Customer chọn loại xe.
+6. Hệ thống kiểm tra thông tin Booking.
+7. Customer xác nhận đặt xe.
+8. Hệ thống tạo Booking.
+9. Hệ thống chuyển Booking sang trạng thái `SEARCHING_DRIVER`.
+10. Hệ thống bắt đầu quá trình tìm Driver.
+11. Hệ thống thông báo Booking đã được tiếp nhận.
+
+### Alternative Flow
+
+**A1 - Điểm đón không hợp lệ**
+
+1. Hệ thống không xác định được điểm đón.
+2. Hệ thống yêu cầu Customer nhập lại.
+
+**A2 - Không có loại xe phù hợp**
+
+1. Hệ thống không tìm thấy dịch vụ phù hợp.
+2. Hệ thống thông báo Customer.
+
+**A3 - Không tìm được Driver**
+
+1. Hệ thống thực hiện tìm kiếm Driver.
+2. Không có Driver phù hợp.
+3. Booking chuyển sang `NO_DRIVER_FOUND`.
+4. Hệ thống thông báo Customer.
+
+---
+
+# 8.3. UC-03 - Find Driver
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-03 |
+| **Use Case Name** | Find Driver |
+| **Primary Actor** | CAB System |
+| **Supporting Actor** | Map/GPS Service |
+| **Goal** | Tìm Driver phù hợp cho Booking. |
+| **Precondition** | Booking ở trạng thái `SEARCHING_DRIVER`. |
+| **Trigger** | Booking mới được tạo. |
+| **Postcondition** | Driver được phân công hoặc Booking chuyển sang `NO_DRIVER_FOUND`. |
+
+### Main Flow
+
+1. Hệ thống nhận Booking.
+2. Hệ thống lấy Pickup Location.
+3. Hệ thống lấy loại xe yêu cầu.
+4. Hệ thống tìm các Driver có trạng thái `AVAILABLE`.
+5. Hệ thống lọc Driver theo loại xe.
+6. Hệ thống xác định khoảng cách giữa Driver và Pickup Location.
+7. Hệ thống sắp xếp Driver theo tiêu chí ưu tiên.
+8. Hệ thống gửi Trip Request đến Driver phù hợp nhất.
+9. Hệ thống chờ phản hồi.
+10. Nếu Driver Accept → thực hiện Assign Driver.
+11. Nếu Driver Reject/Timeout → tìm Driver tiếp theo.
+
+### Alternative Flow
+
+**A1 - Driver Reject**
+
+```text
+Driver Reject
+      ↓
+Đánh dấu Driver không nhận Booking
+      ↓
+Tìm Driver tiếp theo
+```
+
+**A2 - Driver Timeout**
+
+```text
+Không nhận được phản hồi
+      ↓
+Timeout
+      ↓
+Tìm Driver tiếp theo
+```
+
+**A3 - Không còn Driver**
+
+```text
+Không còn Driver phù hợp
+      ↓
+Booking = NO_DRIVER_FOUND
+      ↓
+Thông báo Customer
+```
+
+---
+
+# 8.4. UC-04 - Accept / Reject Trip
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-04 |
+| **Use Case Name** | Accept / Reject Trip |
+| **Primary Actor** | Driver |
+| **Goal** | Cho phép Driver phản hồi yêu cầu chuyến. |
+| **Precondition** | Driver đang Available và nhận được Trip Request. |
+| **Trigger** | Hệ thống gửi Trip Request. |
+| **Postcondition** | Trip được Accept hoặc Reject. |
+
+### Main Flow
+
+1. Driver nhận Trip Request.
+2. Driver xem thông tin chuyến.
+3. Driver chọn `Accept`.
+4. Hệ thống kiểm tra Booking còn khả dụng.
+5. Hệ thống gán Driver cho Booking.
+6. Booking chuyển sang `DRIVER_ASSIGNED`.
+7. Hệ thống thông báo Customer.
+
+### Alternative Flow
+
+- Driver chọn `Reject` → hệ thống tìm Driver khác.
+- Booking đã được Driver khác nhận → hệ thống thông báo Driver.
+- Driver không phản hồi → hệ thống Timeout và tìm Driver khác.
+
+---
+
+# 8.5. UC-05 - Execute Trip
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-05 |
+| **Use Case Name** | Execute Trip |
+| **Primary Actor** | Driver |
+| **Goal** | Cho phép Driver cập nhật trạng thái trong quá trình thực hiện chuyến. |
+| **Precondition** | Driver đã được phân công. |
+| **Trigger** | Driver bắt đầu di chuyển đến điểm đón. |
+| **Postcondition** | Trip được hoàn thành hoặc bị hủy. |
+
+### Main Flow
+
+1. Driver bắt đầu di chuyển.
+2. Driver cập nhật `DRIVER_ARRIVING`.
+3. Driver đến điểm đón.
+4. Driver cập nhật `DRIVER_ARRIVED`.
+5. Customer lên xe.
+6. Driver cập nhật `PASSENGER_PICKED_UP`.
+7. Driver bắt đầu chuyến.
+8. Driver cập nhật `IN_PROGRESS`.
+9. Driver đến điểm đến.
+10. Driver chọn `Complete Trip`.
+11. Hệ thống cập nhật `COMPLETED`.
+12. Hệ thống chuyển sang bước tính cước.
+
+---
+
+# 8.6. UC-06 - Calculate Fare
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-06 |
+| **Use Case Name** | Calculate Fare |
+| **Primary Actor** | CAB System |
+| **Goal** | Xác định số tiền Customer phải thanh toán. |
+| **Precondition** | Trip đã hoàn thành. |
+| **Trigger** | Trip chuyển sang `COMPLETED`. |
+| **Postcondition** | Fare được tính và lưu vào hệ thống. |
+
+### Main Flow
+
+1. Hệ thống nhận thông tin Trip.
+2. Xác định loại xe/dịch vụ.
+3. Lấy thông tin cần thiết để tính cước.
+4. Áp dụng Fare Rule.
+5. Tính tổng tiền.
+6. Lưu Fare.
+7. Hiển thị số tiền Customer cần thanh toán.
+
+### Business Rule
+
+Công thức tính cước cụ thể cần được Business Owner xác nhận trước khi triển khai.
+
+---
+
+# 8.7. UC-07 - Make Payment
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-07 |
+| **Use Case Name** | Make Payment |
+| **Primary Actor** | Customer |
+| **Supporting Actor** | Payment Provider |
+| **Goal** | Customer thanh toán tiền chuyến xe. |
+| **Precondition** | Trip đã hoàn thành và Fare đã được xác định. |
+| **Trigger** | Customer thực hiện thanh toán. |
+| **Postcondition** | Payment được ghi nhận thành công hoặc thất bại. |
+
+### Main Flow
+
+1. Hệ thống hiển thị Fare.
+2. Customer chọn phương thức thanh toán.
+3. Nếu chọn Cash → hệ thống ghi nhận thanh toán tiền mặt.
+4. Nếu chọn Electronic Payment → hệ thống tạo Payment Request.
+5. Payment Provider xử lý giao dịch.
+6. Payment Provider trả kết quả.
+7. CAB cập nhật Payment Status.
+8. Hệ thống thông báo kết quả cho Customer.
+
+### Alternative Flow
+
+**A1 - Payment Failed**
+
+1. Payment Provider trả về Failed.
+2. CAB cập nhật `PAYMENT_FAILED`.
+3. Hệ thống thông báo Customer.
+4. Customer có thể Retry Payment theo chính sách.
+
+---
+
+# 8.8. UC-08 - Rate Driver
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-08 |
+| **Use Case Name** | Rate Driver |
+| **Primary Actor** | Customer |
+| **Goal** | Customer đánh giá chất lượng dịch vụ của Driver. |
+| **Precondition** | Trip đã hoàn thành. |
+| **Trigger** | Customer chọn chức năng Rating. |
+| **Postcondition** | Rating được lưu vào hệ thống. |
+
+### Main Flow
+
+1. Customer mở Trip đã hoàn thành.
+2. Customer chọn `Rate Driver`.
+3. Customer chọn số sao.
+4. Customer có thể nhập nhận xét.
+5. Customer gửi Rating.
+6. Hệ thống kiểm tra dữ liệu.
+7. Hệ thống lưu Rating.
+
+---
+
+# 8.9. UC-09 - Monitor Trip
+
+| Thuộc tính | Nội dung |
+|---|---|
+| **Use Case ID** | UC-09 |
+| **Use Case Name** | Monitor Trip |
+| **Primary Actor** | Operation Staff |
+| **Goal** | Theo dõi trạng thái các chuyến đang diễn ra. |
+| **Precondition** | Operation đã đăng nhập và có quyền truy cập. |
+| **Trigger** | Operation mở màn hình Trip Monitoring. |
+| **Postcondition** | Operation xem được trạng thái Trip và Driver. |
+
+### Main Flow
+
+1. Operation mở Dashboard.
+2. Hệ thống hiển thị danh sách Trip.
+3. Operation lọc theo trạng thái.
+4. Operation chọn Trip cần xem.
+5. Hệ thống hiển thị thông tin Customer, Driver, Pickup, Destination và Trip Status.
+6. Operation có thể thực hiện thao tác hỗ trợ nếu có quyền.
+
+---
+
+# 9. Phân tích Business Process
+
+## 9.1. Tổng quan Business Process
+
+Business Process chính của CAB System bắt đầu từ khi Customer có nhu cầu sử dụng dịch vụ và kết thúc khi chuyến hoàn thành, thanh toán và Customer có thể đánh giá Driver.
+
+```mermaid
+flowchart TD
+
+    A["Customer có nhu cầu đặt xe"]
+    B["Đăng nhập"]
+    C["Nhập Pickup & Destination"]
+    D["Chọn loại xe"]
+    E["Tạo Booking"]
+    F["Hệ thống tìm Driver"]
+    G{"Có Driver phù hợp?"}
+    H["Gửi Trip Request"]
+    I{"Driver Accept?"}
+    J["Assign Driver"]
+    K["Tìm Driver tiếp theo"]
+    L["Thông báo không tìm được Driver"]
+    M["Driver đến điểm đón"]
+    N["Đón Customer"]
+    O["Thực hiện chuyến"]
+    P["Hoàn thành Trip"]
+    Q["Tính Fare"]
+    R["Customer thanh toán"]
+    S{"Payment Success?"}
+    T["Ghi nhận thanh toán"]
+    U["Thông báo Payment Failed"]
+    V["Retry Payment"]
+    W["Customer đánh giá Driver"]
+    X["Kết thúc"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+
+    G -- "Không" --> L
+    G -- "Có" --> H
+    H --> I
+
+    I -- "Không / Timeout" --> K
+    K --> F
+
+    I -- "Có" --> J
+    J --> M
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
+    Q --> R
+    R --> S
+
+    S -- "Có" --> T
+    S -- "Không" --> U
+    U --> V
+    V --> R
+
+    T --> W
+    W --> X
+    L --> X
+```
+
+---
+
+## 9.2. Business Process theo từng giai đoạn
+
+### Phase 1 - Booking
+
+**Input:**
+
+- Customer Account
+- Pickup Location
+- Destination
+- Vehicle Type
+
+**Process:**
+
+1. Customer đăng nhập.
+2. Nhập điểm đón.
+3. Nhập điểm đến.
+4. Chọn loại xe.
+5. Xác nhận Booking.
+
+**Output:**
+
+- Booking được tạo.
+- Booking chuyển sang `SEARCHING_DRIVER`.
+
+---
+
+### Phase 2 - Driver Matching
+
+**Input:**
+
+- Booking
+- Pickup Location
+- Vehicle Type
+- Driver Availability
+- Driver Location
+
+**Process:**
+
+1. Tìm Driver Available.
+2. Lọc Driver theo loại xe.
+3. Xác định khoảng cách.
+4. Xếp hạng Driver.
+5. Gửi Trip Request.
+6. Chờ Driver phản hồi.
+
+**Output:**
+
+- Driver được Assign.
+
+Hoặc:
+
+- Không tìm được Driver → `NO_DRIVER_FOUND`.
+
+---
+
+### Phase 3 - Trip Execution
+
+**Input:**
+
+- Booking
+- Assigned Driver
+
+**Process:**
+
+```text
+DRIVER_ASSIGNED
+       ↓
+DRIVER_ARRIVING
+       ↓
+DRIVER_ARRIVED
+       ↓
+PASSENGER_PICKED_UP
+       ↓
+IN_PROGRESS
+       ↓
+COMPLETED
+```
+
+**Output:**
+
+- Trip hoàn thành.
+- Fare được kích hoạt.
+
+---
+
+### Phase 4 - Fare & Payment
+
+**Input:**
+
+- Trip Information
+- Vehicle Type
+- Fare Rules
+- Payment Method
+
+**Process:**
+
+1. Tính Fare.
+2. Customer chọn phương thức thanh toán.
+3. Xử lý Cash hoặc Electronic Payment.
+4. Nhận kết quả giao dịch.
+5. Cập nhật Payment Status.
+
+**Output:**
+
+- `PAYMENT_SUCCESS`
+- hoặc `PAYMENT_FAILED`.
+
+---
+
+### Phase 5 - Post Trip
+
+Sau khi Trip hoàn thành:
+
+1. Customer xem thông tin chuyến.
+2. Customer xem Fare.
+3. Customer xem Payment Status.
+4. Customer đánh giá Driver.
+5. Hệ thống lưu Trip History.
+6. Dữ liệu được sử dụng cho Operation và Reporting.
+
+---
+
+# 9.3. Business Process Exception
+
+| Exception | Nguyên nhân | Cách xử lý |
+|---|---|---|
+| Không tìm thấy Driver | Không có Driver phù hợp | Thông báo Customer |
+| Driver Reject | Driver từ chối Trip | Tìm Driver tiếp theo |
+| Driver Timeout | Driver không phản hồi | Tìm Driver tiếp theo |
+| Customer Cancel | Customer hủy Trip | Xử lý theo Cancellation Policy |
+| Driver Cancel | Driver hủy Trip | Tìm Driver khác hoặc xử lý theo Policy |
+| GPS Failure | Không nhận được vị trí | Sử dụng vị trí gần nhất hoặc xử lý theo Policy |
+| Payment Failed | Payment Provider từ chối giao dịch | Thông báo Customer và cho phép Retry |
+| Notification Failed | Provider không gửi được thông báo | Retry / Log lỗi |
+| Network Failure | Client mất kết nối | Đồng bộ lại trạng thái khi kết nối trở lại |
+
+---
+
+# 9.4. Business Rules cần xác nhận
+
+Một số bước trong Business Process phụ thuộc vào Business Rules chưa được doanh nghiệp xác định:
+
+| ID | Business Rule | Cần xác nhận |
+|---|---|---|
+| BR-01 | Fare Calculation | Công thức tính cước |
+| BR-02 | Driver Matching | Tiêu chí ưu tiên Driver |
+| BR-03 | Driver Timeout | Thời gian Driver được phép phản hồi |
+| BR-04 | Matching Retry | Số Driver tối đa được thử |
+| BR-05 | Search Radius | Phạm vi tìm Driver |
+| BR-06 | Cancellation | Khi nào Customer/Driver được hủy |
+| BR-07 | Cancellation Fee | Có tính phí hủy hay không |
+| BR-08 | Payment Retry | Số lần được Retry Payment |
+| BR-09 | GPS Failure | Cách xử lý khi mất vị trí |
+| BR-10 | Data Retention | Thời gian lưu trữ dữ liệu |
+
+---
+
+## 9.5. Business Process chính của MVP
+
+Có thể tóm tắt toàn bộ nghiệp vụ MVP bằng chuỗi:
+
+**Book → Match → Assign → Pickup → Ride → Complete → Fare → Pay → Rate**
+
+Đây là **Core Business Process** mà BA cần ưu tiên phân tích, thiết kế và nghiệm thu trong phạm vi 7 tuần.
