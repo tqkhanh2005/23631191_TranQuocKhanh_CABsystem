@@ -49,16 +49,23 @@ Stakeholder Matrix được sử dụng để đánh giá các bên liên quan d
 
 ## Ma trận các bên liên quan
 
+## Ma trận các bên liên quan
+
+Ma trận các bên liên quan được phân loại dựa trên hai tiêu chí:
+
+- **Power:** Mức độ quyền lực/ảnh hưởng của stakeholder đối với dự án.
+- **Interest:** Mức độ quan tâm của stakeholder đối với hệ thống CAB.
+
 ```mermaid
 quadrantChart
     title CAB System - Stakeholder Power Interest Matrix
-    x-axis "Interest thấp" --> "Interest cao"
-    y-axis "Power thấp" --> "Power cao"
+    x-axis Interest thấp --> Interest cao
+    y-axis Power thấp --> Power cao
 
-    quadrant-1 "MANAGE CLOSELY"
-    quadrant-2 "KEEP SATISFIED"
-    quadrant-3 "MONITOR"
-    quadrant-4 "KEEP INFORMED / ENGAGE"
+    quadrant-1 MANAGE CLOSELY
+    quadrant-2 KEEP SATISFIED
+    quadrant-3 MONITOR
+    quadrant-4 KEEP INFORMED / ENGAGE
 
     "Business Owner": [0.88, 0.92]
     "Operation": [0.85, 0.88]
@@ -76,15 +83,16 @@ quadrantChart
     "Notification Provider": [0.30, 0.20]
     "Payment Provider": [0.55, 0.45]
     "Map / GPS Provider": [0.50, 0.38]
+```
 
 ### Chiến lược quản lý
 
 | Nhóm | Chiến lược |
 |---|---|
 | **Manage Closely** | Làm việc thường xuyên, tham gia phân tích, review và phê duyệt các yêu cầu quan trọng. |
-| **Keep Satisfied** | Đảm bảo stakeholder được cung cấp đầy đủ thông tin và được tham gia khi có vấn đề liên quan đến phạm vi của họ. |
+| **Keep Satisfied** | Đảm bảo stakeholder được cung cấp đầy đủ thông tin và được tham gia khi có vấn đề liên quan. |
 | **Keep Informed / Engage** | Thường xuyên thu thập nhu cầu, phản hồi và cập nhật thông tin liên quan đến hệ thống. |
-| **Monitor** | Theo dõi ở mức phù hợp và chủ động trao đổi khi có thay đổi ảnh hưởng đến stakeholder. |    
+| **Monitor** | Theo dõi ở mức phù hợp và trao đổi khi có thay đổi ảnh hưởng đến stakeholder. |   
 
 ## Xác định Business Unit
 
