@@ -84,3 +84,119 @@ Business Unit là các đơn vị/bộ phận trong doanh nghiệp tham gia vào
 | **Bộ phận An toàn thông tin (Security/Compliance)** | Đảm bảo hệ thống tuân thủ các yêu cầu về xác thực, phân quyền, bảo vệ dữ liệu cá nhân, dữ liệu vị trí, dữ liệu giao dịch và audit log. |
 | **Khách hàng (Customer)** | Sử dụng dịch vụ CAB để đặt xe, theo dõi chuyến, thanh toán và đánh giá chất lượng dịch vụ. |
 | **Tài xế (Driver)** | Cung cấp dịch vụ vận chuyển, nhận chuyến, thực hiện chuyến, cập nhật trạng thái và vị trí trong quá trình phục vụ khách hàng. |
+
+## Phạm vi dự án trong 7 tuần
+
+### 1. Mục tiêu phạm vi
+
+Trong thời gian triển khai 7 tuần, dự án tập trung xây dựng **MVP (Minimum Viable Product)** của CAB System, đáp ứng đầy đủ quy trình đặt xe trực tuyến cơ bản từ khi khách hàng tạo yêu cầu đến khi chuyến xe hoàn thành và thanh toán.
+
+Mục tiêu của MVP là tạo ra một hệ thống có thể vận hành được quy trình:
+
+**Customer → Booking → Driver Matching → Driver Acceptance → Trip → Fare → Payment → Completion**
+
+Các tính năng nâng cao và các yêu cầu chưa có business rule rõ ràng sẽ được xem xét cho các giai đoạn phát triển tiếp theo.
+
+---
+
+### 2. Phạm vi chức năng chính
+
+| Nhóm chức năng | Phạm vi thực hiện trong MVP | Mức độ |
+|---|---|---|
+| **Authentication** | Đăng ký, đăng nhập, đăng xuất cho Customer và Driver | Must Have |
+| **Customer Profile** | Xem và cập nhật thông tin cá nhân | Must Have |
+| **Driver Profile** | Xem và cập nhật thông tin tài xế | Must Have |
+| **Vehicle Management** | Quản lý thông tin phương tiện của tài xế | Must Have |
+| **Driver Availability** | Driver bật/tắt trạng thái sẵn sàng nhận chuyến | Must Have |
+| **Booking** | Customer nhập điểm đón, điểm đến và chọn loại xe | Must Have |
+| **Driver Matching** | Hệ thống tìm tài xế phù hợp dựa trên trạng thái và khoảng cách cơ bản | Must Have |
+| **Driver Acceptance** | Driver nhận thông báo và Accept/Reject chuyến | Must Have |
+| **Trip Management** | Quản lý trạng thái chuyến từ nhận chuyến đến hoàn thành | Must Have |
+| **Driver Location** | Cập nhật vị trí tài xế ở mức cơ bản để hỗ trợ theo dõi chuyến | Should Have |
+| **Fare Calculation** | Tính cước dựa trên loại xe và thông tin chuyến đi theo công thức cơ bản | Must Have |
+| **Payment** | Thanh toán tiền mặt và tích hợp một phương thức thanh toán điện tử | Must Have |
+| **Payment Status** | Theo dõi trạng thái thanh toán Success/Failed/Pending | Must Have |
+| **Notification** | Thông báo các sự kiện chính của booking/trip/payment | Must Have |
+| **Trip History** | Customer và Driver xem lịch sử chuyến | Should Have |
+| **Rating** | Customer đánh giá Driver sau khi hoàn thành chuyến | Should Have |
+| **Operation Dashboard** | Nhân viên vận hành xem danh sách và trạng thái các chuyến | Must Have |
+| **Driver Management** | Operation quản lý danh sách tài xế | Must Have |
+| **Customer Management** | Operation xem và quản lý khách hàng | Should Have |
+| **Basic Reporting** | Báo cáo cơ bản về số chuyến, doanh thu, hoàn thành và hủy | Should Have |
+| **RBAC** | Phân quyền cơ bản giữa Customer, Driver, Operation và Admin | Must Have |
+| **Audit Log** | Lưu vết một số thao tác quản trị quan trọng | Should Have |
+
+---
+
+### 3. Quy trình nghiệp vụ nằm trong MVP
+
+#### 3.1. Quy trình đặt xe
+
+```text
+Customer Login
+      ↓
+Nhập Pickup & Destination
+      ↓
+Chọn loại xe
+      ↓
+Tạo Booking
+      ↓
+Booking được tiếp nhận
+      ↓
+Tìm Driver
+      ↓
+Driver nhận chuyến
+      ↓
+Driver đến điểm đón
+      ↓
+Đón khách
+      ↓
+Đang thực hiện chuyến
+      ↓
+Hoàn thành chuyến
+      ↓
+Tính cước
+      ↓
+Thanh toán
+      ↓
+Đánh giá Driver
+
+Booking
+   ↓
+Find Available Drivers
+   ↓
+Filter Vehicle Type
+   ↓
+Sort by Distance
+   ↓
+Select Driver
+   ↓
+Send Trip Request
+   ↓
+ ┌───────────────┐
+ │               │
+Accept         Reject/Timeout
+ │               │
+ ↓               ↓
+Assign       Next Driver
+Driver           │
+                 ↓
+            No Driver
+                 ↓
+          Notify Customer
+
+REQUESTED
+    ↓
+SEARCHING_DRIVER
+    ↓
+DRIVER_ASSIGNED
+    ↓
+DRIVER_ARRIVING
+    ↓
+DRIVER_ARRIVED
+    ↓
+PASSENGER_PICKED_UP
+    ↓
+IN_PROGRESS
+    ↓
+COMPLETED
