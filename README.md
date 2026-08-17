@@ -343,4 +343,245 @@ Sau khi MVP hoàn thành, doanh nghiệp có thể chuyển từ mô hình đặ
 
 **Customer tạo yêu cầu → CAB tự động tìm Driver → Driver nhận và thực hiện chuyến → CAB theo dõi Trip → Tính cước → Thanh toán → Hoàn thành**
 
+Đúng hướng rồi. Với mục **“Phân rã yêu cầu chức năng”**, BA nên đi từ **Functional Requirement cấp cao → các Functional Requirement cấp thấp**, để sau này có thể tiếp tục chuyển thành **Use Case, User Story, Acceptance Criteria và Test Case**.
+
+Bạn có thể copy trực tiếp phần dưới vào `README.md`:
+
+````markdown
+## 5. Phân rã yêu cầu chức năng
+
+Yêu cầu chức năng được phân rã từ các nghiệp vụ cốt lõi của CAB System thành các chức năng nhỏ hơn, có thể phát triển, kiểm thử và nghiệm thu độc lập.
+
+### 5.1. Quản lý tài khoản
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-01 | Đăng ký tài khoản | Customer có thể tạo tài khoản bằng thông tin cá nhân cần thiết. |
+| FR-02 | Đăng nhập | Customer, Driver và Staff có thể đăng nhập bằng tài khoản hợp lệ. |
+| FR-03 | Đăng xuất | Người dùng có thể đăng xuất khỏi hệ thống. |
+| FR-04 | Cập nhật thông tin cá nhân | Người dùng có thể xem và cập nhật thông tin cá nhân. |
+| FR-05 | Phân quyền | Hệ thống xác định quyền truy cập dựa trên vai trò của người dùng. |
+
+---
+
+### 5.2. Quản lý Customer
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-06 | Xem thông tin Customer | Customer có thể xem thông tin tài khoản của mình. |
+| FR-07 | Cập nhật thông tin Customer | Customer có thể cập nhật các thông tin cá nhân được phép thay đổi. |
+| FR-08 | Xem lịch sử chuyến | Customer có thể xem danh sách các chuyến đã đặt. |
+| FR-09 | Xem chi tiết chuyến | Customer có thể xem thông tin chi tiết của một chuyến. |
+
+---
+
+### 5.3. Xác định vị trí Customer
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-10 | Nhập điểm đón | Customer có thể nhập hoặc chọn vị trí đón khách. |
+| FR-11 | Xác định vị trí hiện tại | Hệ thống có thể lấy vị trí hiện tại của Customer khi được cấp quyền. |
+| FR-12 | Xác nhận điểm đón | Customer có thể xác nhận vị trí đón trước khi tạo Booking. |
+| FR-13 | Nhập điểm đến | Customer có thể nhập hoặc chọn điểm đến. |
+| FR-14 | Kiểm tra thông tin tuyến đường | Hệ thống xác định thông tin cơ bản giữa điểm đón và điểm đến. |
+
+---
+
+### 5.4. Đặt xe (Booking)
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-15 | Chọn loại xe | Customer có thể lựa chọn loại dịch vụ/loại xe phù hợp. |
+| FR-16 | Tạo Booking | Customer có thể gửi yêu cầu đặt xe với thông tin điểm đón, điểm đến và loại xe. |
+| FR-17 | Kiểm tra Booking | Hệ thống kiểm tra thông tin Booking trước khi tạo yêu cầu. |
+| FR-18 | Xác nhận Booking | Hệ thống ghi nhận và xác nhận yêu cầu đặt xe của Customer. |
+| FR-19 | Theo dõi trạng thái Booking | Customer có thể theo dõi trạng thái yêu cầu đặt xe. |
+| FR-20 | Hủy Booking | Customer có thể hủy Booking theo chính sách của doanh nghiệp. |
+
+---
+
+### 5.5. Quản lý Driver
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-21 | Đăng ký Driver | Hệ thống cho phép tạo tài khoản Driver theo quy trình của doanh nghiệp. |
+| FR-22 | Quản lý hồ sơ Driver | Driver có thể xem và cập nhật thông tin hồ sơ được phép thay đổi. |
+| FR-23 | Quản lý phương tiện | Driver/Operation có thể quản lý thông tin phương tiện. |
+| FR-24 | Cập nhật trạng thái hoạt động | Driver có thể chuyển trạng thái giữa sẵn sàng và không sẵn sàng nhận chuyến. |
+| FR-25 | Kiểm tra điều kiện nhận chuyến | Hệ thống kiểm tra Driver có đủ điều kiện nhận Booking hay không. |
+
+---
+
+### 5.6. Xác định vị trí Driver
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-26 | Gửi vị trí Driver | Hệ thống nhận thông tin vị trí hiện tại của Driver. |
+| FR-27 | Cập nhật vị trí | Vị trí Driver được cập nhật trong khoảng thời gian phù hợp khi Driver đang hoạt động. |
+| FR-28 | Xác định khoảng cách | Hệ thống xác định khoảng cách tương đối giữa Driver và điểm đón. |
+| FR-29 | Xác định ETA | Hệ thống hỗ trợ xác định thời gian dự kiến Driver đến điểm đón. |
+
+---
+
+### 5.7. Tìm kiếm và phân công Driver
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-30 | Tìm Driver sẵn sàng | Hệ thống tìm các Driver đang ở trạng thái `AVAILABLE`. |
+| FR-31 | Lọc Driver theo loại xe | Hệ thống chỉ lựa chọn Driver có phương tiện phù hợp với loại xe Customer yêu cầu. |
+| FR-32 | Lọc Driver theo vị trí | Hệ thống xác định các Driver nằm trong phạm vi phù hợp với điểm đón. |
+| FR-33 | Xếp hạng Driver | Hệ thống ưu tiên Driver dựa trên các tiêu chí đã được doanh nghiệp xác định. |
+| FR-34 | Chọn Driver phù hợp | Hệ thống lựa chọn Driver phù hợp nhất để gửi yêu cầu chuyến. |
+| FR-35 | Gửi yêu cầu nhận chuyến | Hệ thống gửi thông tin Booking đến Driver được lựa chọn. |
+| FR-36 | Chờ phản hồi Driver | Hệ thống chờ Driver chấp nhận hoặc từ chối trong khoảng thời gian quy định. |
+| FR-37 | Xử lý Driver từ chối | Nếu Driver từ chối, hệ thống tiếp tục tìm Driver khác. |
+| FR-38 | Xử lý Driver không phản hồi | Nếu Driver không phản hồi trong thời gian quy định, hệ thống chuyển sang Driver khác. |
+| FR-39 | Phân công Driver | Khi Driver chấp nhận, hệ thống gán Driver vào Booking. |
+| FR-40 | Không tìm được Driver | Nếu không tìm được Driver phù hợp, hệ thống thông báo cho Customer. |
+
+---
+
+### 5.8. Quản lý Trip
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-41 | Tạo Trip | Hệ thống tạo Trip sau khi Driver được phân công. |
+| FR-42 | Driver đang đến | Driver cập nhật trạng thái đang di chuyển đến điểm đón. |
+| FR-43 | Driver đã đến | Driver cập nhật trạng thái đã đến điểm đón. |
+| FR-44 | Đã đón khách | Driver cập nhật trạng thái đã đón Customer. |
+| FR-45 | Đang thực hiện chuyến | Driver cập nhật trạng thái chuyến đang di chuyển. |
+| FR-46 | Hoàn thành Trip | Driver có thể đánh dấu Trip hoàn thành. |
+| FR-47 | Hủy Trip | Hệ thống hỗ trợ hủy Trip theo chính sách doanh nghiệp. |
+| FR-48 | Theo dõi trạng thái Trip | Customer có thể xem trạng thái hiện tại của Trip. |
+
+---
+
+### 5.9. Tính cước
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-49 | Xác định loại dịch vụ | Hệ thống xác định loại xe/dịch vụ được sử dụng. |
+| FR-50 | Thu thập thông tin tính cước | Hệ thống lấy các thông tin cần thiết để tính giá chuyến. |
+| FR-51 | Tính Fare | Hệ thống tính số tiền Customer phải thanh toán theo công thức cước đã cấu hình. |
+| FR-52 | Hiển thị Fare | Customer có thể xem số tiền phải trả sau khi Trip hoàn thành. |
+| FR-53 | Lưu thông tin Fare | Hệ thống lưu thông tin giá chuyến để phục vụ tra cứu và đối soát. |
+
+---
+
+### 5.10. Thanh toán
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-54 | Chọn phương thức thanh toán | Customer có thể chọn Cash hoặc Electronic Payment. |
+| FR-55 | Thanh toán tiền mặt | Hệ thống ghi nhận trạng thái thanh toán tiền mặt theo quy trình nghiệp vụ. |
+| FR-56 | Khởi tạo thanh toán điện tử | Hệ thống gửi yêu cầu thanh toán đến Payment Provider. |
+| FR-57 | Nhận kết quả thanh toán | Hệ thống nhận và cập nhật kết quả giao dịch từ Payment Provider. |
+| FR-58 | Xử lý Payment Failed | Hệ thống ghi nhận giao dịch thất bại và thông báo cho Customer. |
+| FR-59 | Retry Payment | Customer có thể thực hiện lại thanh toán theo chính sách doanh nghiệp. |
+| FR-60 | Tra cứu giao dịch | Operation/Finance có thể tra cứu trạng thái giao dịch. |
+
+---
+
+### 5.11. Notification
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-61 | Thông báo Booking | Thông báo khi hệ thống tiếp nhận Booking. |
+| FR-62 | Thông báo Driver | Thông báo cho Driver khi có Booking phù hợp. |
+| FR-63 | Thông báo Driver được phân công | Thông báo cho Customer khi Driver nhận chuyến. |
+| FR-64 | Thông báo Driver đến | Thông báo cho Customer khi Driver đến điểm đón. |
+| FR-65 | Thông báo Trip hoàn thành | Thông báo khi Trip hoàn thành. |
+| FR-66 | Thông báo Payment | Thông báo kết quả thanh toán cho Customer. |
+| FR-67 | Retry Notification | Hệ thống có khả năng gửi lại Notification khi xảy ra lỗi tạm thời. |
+
+---
+
+### 5.12. Rating
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-68 | Đánh giá Driver | Customer có thể đánh giá Driver sau khi Trip hoàn thành. |
+| FR-69 | Lưu Rating | Hệ thống lưu kết quả đánh giá gắn với Trip tương ứng. |
+
+---
+
+### 5.13. Operation Management
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-70 | Xem danh sách Trip | Operation có thể xem các Trip trong hệ thống. |
+| FR-71 | Theo dõi Trip đang diễn ra | Operation có thể theo dõi trạng thái các Trip đang thực hiện. |
+| FR-72 | Theo dõi Driver | Operation có thể xem trạng thái hoạt động của Driver. |
+| FR-73 | Tra cứu Customer | Operation có thể tìm kiếm và xem thông tin Customer. |
+| FR-74 | Tra cứu Payment | Operation có thể tra cứu thông tin giao dịch. |
+| FR-75 | Hỗ trợ xử lý Exception | Operation có thể hỗ trợ xử lý các trường hợp Trip/Payment gặp vấn đề. |
+
+---
+
+### 5.14. Reporting
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-76 | Báo cáo số lượng Trip | Hệ thống cung cấp số lượng Trip theo khoảng thời gian. |
+| FR-77 | Báo cáo doanh thu | Hệ thống cung cấp thông tin doanh thu. |
+| FR-78 | Báo cáo Trip hoàn thành | Hệ thống cung cấp tỷ lệ Trip hoàn thành. |
+| FR-79 | Báo cáo Trip hủy | Hệ thống cung cấp tỷ lệ Trip bị hủy. |
+| FR-80 | Báo cáo hiệu quả Driver | Hệ thống cung cấp các chỉ số cơ bản về hoạt động của Driver. |
+
+---
+
+### 5.15. Security & Audit
+
+| ID | Yêu cầu chức năng | Mô tả |
+|---|---|---|
+| FR-81 | Authentication | Người dùng phải được xác thực trước khi sử dụng các chức năng yêu cầu tài khoản. |
+| FR-82 | Authorization | Hệ thống kiểm tra quyền trước khi cho phép thực hiện chức năng. |
+| FR-83 | Bảo vệ dữ liệu | Hệ thống kiểm soát quyền truy cập đối với dữ liệu cá nhân, vị trí và giao dịch. |
+| FR-84 | Audit Log | Hệ thống ghi nhận các thao tác quản trị và nghiệp vụ quan trọng. |
+| FR-85 | Error Logging | Hệ thống ghi nhận lỗi để hỗ trợ theo dõi và xử lý sự cố. |
+
+---
+
+### 5.16. Tổng quan phân rã chức năng
+
+```mermaid
+flowchart TD
+    CAB["CAB System"]
+
+    CAB --> AUTH["1. Authentication & Account"]
+    CAB --> CUSTOMER["2. Customer Management"]
+    CAB --> BOOKING["3. Booking"]
+    CAB --> DRIVER["4. Driver Management"]
+    CAB --> LOCATION["5. Location Management"]
+    CAB --> MATCHING["6. Driver Matching"]
+    CAB --> TRIP["7. Trip Management"]
+    CAB --> FARE["8. Fare Calculation"]
+    CAB --> PAYMENT["9. Payment"]
+    CAB --> NOTI["10. Notification"]
+    CAB --> RATING["11. Rating"]
+    CAB --> OPERATION["12. Operation Management"]
+    CAB --> REPORT["13. Reporting"]
+    CAB --> SECURITY["14. Security & Audit"]
+
+    BOOKING --> LOCATION
+    BOOKING --> MATCHING
+    MATCHING --> DRIVER
+    MATCHING --> TRIP
+    TRIP --> FARE
+    FARE --> PAYMENT
+    TRIP --> NOTI
+    PAYMENT --> NOTI
+    TRIP --> RATING
+```
+
+### 5.17. Core Functional Flow
+
+Đối với MVP 7 tuần, các chức năng quan trọng nhất cần hoàn thành theo chuỗi:
+
+**Customer → Location → Booking → Driver Matching → Driver Acceptance → Trip → Fare → Payment → Notification → Rating**
+
+Đây là **Core Functional Scope** của CAB System. Các chức năng Reporting, Advanced Matching và các tính năng mở rộng có thể được triển khai ở mức cơ bản hoặc đưa sang Phase 2.
+````
+
+
 Qua đó doanh nghiệp có nền tảng cơ bản để tiếp tục mở rộng quy mô khách hàng, tài xế và các dịch vụ CAB trong các giai đoạn tiếp theo.
