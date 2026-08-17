@@ -195,11 +195,6 @@ Thanh toán
 Customer đánh giá Driver
 ```
 
-Được. Với vai trò **BA**, khi chuyển từ đề bài của khách hàng sang **Business Requirements (BR)**, cần tập trung vào **doanh nghiệp cần đạt được điều gì**, thay vì mô tả hệ thống phải code như thế nào.
-
-Với phạm vi **MVP 7 tuần**, tôi đề xuất chuẩn hóa Business Requirements như sau:
-
-```markdown
 ## Business Requirements
 
 ### 1. Mục tiêu
@@ -323,4 +318,3 @@ Sau khi MVP hoàn thành, doanh nghiệp có thể chuyển từ mô hình đặ
 **Customer tạo yêu cầu → CAB tự động tìm Driver → Driver nhận và thực hiện chuyến → CAB theo dõi Trip → Tính cước → Thanh toán → Hoàn thành**
 
 Qua đó doanh nghiệp có nền tảng cơ bản để tiếp tục mở rộng quy mô khách hàng, tài xế và các dịch vụ CAB trong các giai đoạn tiếp theo.
-```
