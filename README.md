@@ -45,19 +45,20 @@ quadrantChart
     title Stakeholder Matrix - Interest vs Influence
     x-axis Low Interest --> High Interest
     y-axis Low Influence --> High Influence
-    quadrant-1 Quản lý chặt chẽ (Manage Closely)
-    quadrant-2 Giữ hài lòng (Keep Satisfied)
-    quadrant-3 Theo dõi tối thiểu (Monitor)
-    quadrant-4 Giữ thông tin (Keep Informed)
-    Ban giám đốc: [0.7, 0.9]
-    Khách hàng: [0.9, 0.5]
-    Tài xế: [0.85, 0.45]
-    Nhân viên vận hành: [0.8, 0.6]
-    Bộ phận Kinh doanh: [0.6, 0.55]
-    Nhà cung cấp thanh toán: [0.4, 0.7]
-    Nhóm phát triển: [0.9, 0.65]
-    Bộ phận CSKH: [0.55, 0.3]
-    Cơ quan quản lý: [0.3, 0.75]
+    quadrant-1 Manage Closely
+    quadrant-2 Keep Satisfied
+    quadrant-3 Monitor
+    quadrant-4 Keep Informed
+
+    "Ban giam doc": [0.7, 0.9]
+    "Khach hang": [0.9, 0.5]
+    "Tai xe": [0.85, 0.45]
+    "Nhan vien van hanh": [0.8, 0.6]
+    "Bo phan Kinh doanh": [0.6, 0.55]
+    "Nha cung cap thanh toan": [0.4, 0.7]
+    "Nhom phat trien": [0.9, 0.65]
+    "Bo phan CSKH": [0.55, 0.3]
+    "Co quan quan ly": [0.3, 0.75]
 ```
 
 ---
