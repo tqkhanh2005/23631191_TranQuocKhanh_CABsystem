@@ -1,0 +1,1204 @@
+openapi: 3.0.3
+info:
+  title: CAB System API
+  description: API cho nền tảng đặt xe trực tuyến CAB System. Thiết kế dựa trên Business Analysis Document, 24 Use Case, Business
+    Rules và API định hướng trong README.
+  version: 1.0.0
+  contact:
+    name: CAB System / Business Analysis Team
+servers:
+- url: http://localhost:8080/api/v1
+  description: Local development
+tags:
+- name: Authentication
+  description: Đăng ký, đăng nhập, đăng xuất
+- name: Customers
+  description: Quản lý hồ sơ khách hàng
+- name: Drivers
+  description: Quản lý hồ sơ, trạng thái và vị trí tài xế
+- name: Rides
+  description: Tạo, hủy và theo dõi yêu cầu/chuyến xe
+- name: Matching
+  description: Tìm và phân công tài xế
+- name: Trips
+  description: Cập nhật trạng thái chuyến
+- name: Payments
+  description: Tính cước và thanh toán
+- name: Notifications
+  description: Thông báo sự kiện
+- name: Ratings
+  description: Đánh giá tài xế
+- name: Administration
+  description: Quản trị vận hành
+- name: Reports
+  description: Báo cáo vận hành và kinh doanh
+security:
+- bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      tags:
+      - Authentication
+      summary: Đăng ký tài khoản
+      description: UC-01. Tạo tài khoản khách hàng hoặc tài xế.
+      operationId: register
+      responses:
+        '201':
+          description: Tạo tài khoản thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400': &id001
+          description: Bad request / unauthorized / business rule violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+  /auth/login:
+    post:
+      tags:
+      - Authentication
+      summary: Đăng nhập
+      description: UC-02. Xác thực người dùng và cấp access token.
+      operationId: login
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401': *id001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+  /auth/logout:
+    post:
+      tags:
+      - Authentication
+      summary: Đăng xuất
+      description: UC-02. Kết thúc phiên đăng nhập.
+      operationId: logout
+      responses:
+        '204':
+          description: Đăng xuất thành công
+      security:
+      - bearerAuth: []
+  /customers/{id}:
+    get:
+      tags:
+      - Customers
+      summary: Xem hồ sơ khách hàng
+      description: UC-03. Xem thông tin hồ sơ.
+      operationId: getCustomer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      tags:
+      - Customers
+      summary: Cập nhật hồ sơ khách hàng
+      description: UC-03. Cập nhật thông tin hồ sơ.
+      operationId: updateCustomer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /drivers/{id}:
+    get:
+      tags:
+      - Drivers
+      summary: Xem hồ sơ tài xế
+      description: UC-10/UC-22. Xem thông tin tài xế và phương tiện.
+      operationId: getDriver
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '404': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      tags:
+      - Drivers
+      summary: Cập nhật hồ sơ/phương tiện
+      description: UC-10. Tài xế cập nhật hồ sơ và phương tiện.
+      operationId: updateDriver
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Driver'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /drivers/{id}/availability:
+    put:
+      tags:
+      - Drivers
+      summary: Cập nhật trạng thái sẵn sàng
+      description: UC-11. Chỉ tài xế sẵn sàng mới được matching.
+      operationId: updateDriverAvailability
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - availability
+              properties:
+                availability:
+                  type: string
+                  enum:
+                  - AVAILABLE
+                  - OFFLINE
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /drivers/{id}/location:
+    put:
+      tags:
+      - Drivers
+      summary: Cập nhật vị trí tài xế
+      description: UC-15. Gửi vị trí hiện tại của tài xế.
+      operationId: updateDriverLocation
+      responses:
+        '200':
+          description: Vị trí được cập nhật
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationUpdate'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /rides:
+    post:
+      tags:
+      - Rides
+      summary: Đặt xe
+      description: UC-04. Tạo yêu cầu đặt xe, tính cước ước tính và kích hoạt matching.
+      operationId: createRide
+      responses:
+        '201':
+          description: Tạo yêu cầu thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RideCreateRequest'
+  /rides/{id}:
+    get:
+      tags:
+      - Rides
+      summary: Xem chi tiết chuyến
+      description: UC-06/UC-07. Xem thông tin và trạng thái chuyến.
+      operationId: getRide
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '404': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      tags:
+      - Rides
+      summary: Hủy yêu cầu đặt xe
+      description: UC-05. Hủy theo chính sách và trạng thái hiện tại.
+      operationId: cancelRide
+      responses:
+        '204':
+          description: Hủy thành công
+        '400': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /rides/{id}/status:
+    get:
+      tags:
+      - Rides
+      summary: Theo dõi trạng thái chuyến
+      description: UC-06. Trả về trạng thái hiện tại của chuyến.
+      operationId: getRideStatus
+      responses:
+        '200':
+          description: Trạng thái chuyến
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rideId:
+                    type: string
+                  status:
+                    type: string
+                  driver:
+                    $ref: '#/components/schemas/Driver'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /rides/{id}/rating:
+    post:
+      tags:
+      - Ratings
+      summary: Đánh giá tài xế
+      description: UC-09. Chỉ cho đánh giá khi chuyến đã hoàn thành.
+      operationId: rateDriver
+      responses:
+        '201':
+          description: Đánh giá thành công
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /rides/{id}/matching:
+    post:
+      tags:
+      - Matching
+      summary: Tìm tài xế
+      description: UC-17. Lọc tài xế sẵn sàng và xếp hạng theo tiêu chí matching.
+      operationId: findDrivers
+      responses:
+        '200':
+          description: Danh sách tài xế phù hợp
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Driver'
+        '404': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /rides/{id}/assign:
+    post:
+      tags:
+      - Matching
+      summary: Phân công tài xế
+      description: UC-18. Gửi đề xuất theo thứ tự và gán tài xế khi chấp nhận.
+      operationId: assignDriver
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '404': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - driverId
+              properties:
+                driverId:
+                  type: string
+                  example: DRV-001
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /rides/{id}/driver-response:
+    post:
+      tags:
+      - Matching
+      summary: Chấp nhận/Từ chối chuyến
+      description: UC-13. Tài xế phản hồi đề xuất; từ chối/timeout thì matching tài xế tiếp theo.
+      operationId: driverResponse
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DriverResponse'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /trips/{id}/status:
+    put:
+      tags:
+      - Trips
+      summary: Cập nhật trạng thái chuyến
+      description: UC-14. Chuyển trạng thái theo đúng thứ tự nghiệp vụ.
+      operationId: updateTripStatus
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripStatusUpdate'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /trips/{id}:
+    get:
+      tags:
+      - Trips
+      summary: Xem thông tin chuyến
+      description: UC-06/UC-23. Xem thông tin chuyến đang hoạt động.
+      operationId: getTrip
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+        '404': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payments:
+    post:
+      tags:
+      - Payments
+      summary: Thanh toán chuyến đi
+      description: UC-08/UC-16. Hỗ trợ tiền mặt hoặc điện tử; không lưu dữ liệu thẻ nhạy cảm.
+      operationId: createPayment
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+  /payments/{id}:
+    get:
+      tags:
+      - Payments
+      summary: Xem giao dịch thanh toán
+      description: UC-07/UC-08. Tra cứu trạng thái giao dịch.
+      operationId: getPayment
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /rides/{id}/fare:
+    post:
+      tags:
+      - Payments
+      summary: Tính cước chuyến đi
+      description: UC-19. Tính cước sau khi chuyến chuyển sang Hoàn thành.
+      operationId: calculateFare
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareEstimate'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /notifications:
+    get:
+      tags:
+      - Notifications
+      summary: Xem thông báo
+      description: UC-20. Lấy các thông báo sự kiện của người dùng.
+      operationId: getNotifications
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Notifications
+      summary: Gửi thông báo
+      description: UC-20. Endpoint phục vụ service notification/operator theo nghiệp vụ.
+      operationId: sendNotification
+      responses:
+        '202':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '400': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - recipientId
+              - type
+              - message
+              properties:
+                recipientId:
+                  type: string
+                type:
+                  type: string
+                message:
+                  type: string
+  /admin/customers:
+    get:
+      tags:
+      - Administration
+      summary: Quản lý khách hàng
+      description: UC-21. Operator/Admin tra cứu khách hàng.
+      operationId: adminCustomers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+      security:
+      - bearerAuth: []
+  /admin/drivers:
+    get:
+      tags:
+      - Administration
+      summary: Quản lý tài xế
+      description: UC-22. Operator/Admin tra cứu tài xế và phương tiện.
+      operationId: adminDrivers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Driver'
+      security:
+      - bearerAuth: []
+  /admin/vehicles:
+    get:
+      tags:
+      - Administration
+      summary: Quản lý phương tiện
+      description: UC-22. Tra cứu phương tiện.
+      operationId: adminVehicles
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+      security:
+      - bearerAuth: []
+  /admin/trips:
+    get:
+      tags:
+      - Administration
+      summary: Giám sát chuyến đi
+      description: UC-23. Xem các chuyến đang diễn ra.
+      operationId: adminTrips
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ride'
+      security:
+      - bearerAuth: []
+  /admin/trips/incidents:
+    get:
+      tags:
+      - Administration
+      summary: Xử lý sự cố
+      description: UC-23. Tra cứu các chuyến có sự cố.
+      operationId: adminIncidents
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Incident'
+      security:
+      - bearerAuth: []
+  /reports/trips:
+    get:
+      tags:
+      - Reports
+      summary: Báo cáo số chuyến
+      description: UC-24. Báo cáo có thể lọc theo khoảng thời gian.
+      operationId: reportTrips
+      responses:
+        '200':
+          description: Báo cáo
+          content:
+            application/json:
+              schema: &id002
+                type: object
+                properties:
+                  from:
+                    type: string
+                    format: date
+                  to:
+                    type: string
+                    format: date
+                  total:
+                    type: number
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+      security:
+      - bearerAuth: []
+      parameters: &id003
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+        description: Ngày bắt đầu
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+        description: Ngày kết thúc
+  /reports/revenue:
+    get:
+      tags:
+      - Reports
+      summary: Báo cáo doanh thu
+      description: UC-24. Báo cáo có thể lọc theo khoảng thời gian.
+      operationId: reportRevenue
+      responses:
+        '200':
+          description: Báo cáo
+          content:
+            application/json:
+              schema: *id002
+      security:
+      - bearerAuth: []
+      parameters: *id003
+  /reports/cancellation:
+    get:
+      tags:
+      - Reports
+      summary: Báo cáo hoàn thành/hủy
+      description: UC-24. Báo cáo có thể lọc theo khoảng thời gian.
+      operationId: reportCancellation
+      responses:
+        '200':
+          description: Báo cáo
+          content:
+            application/json:
+              schema: *id002
+      security:
+      - bearerAuth: []
+      parameters: *id003
+  /reports/drivers:
+    get:
+      tags:
+      - Reports
+      summary: Báo cáo hiệu quả tài xế
+      description: UC-24. Báo cáo có thể lọc theo khoảng thời gian.
+      operationId: reportDrivers
+      responses:
+        '200':
+          description: Báo cáo
+          content:
+            application/json:
+              schema: *id002
+      security:
+      - bearerAuth: []
+      parameters: *id003
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Dữ liệu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+    UserRegistration:
+      type: object
+      required:
+      - fullName
+      - phone
+      - password
+      - role
+      properties:
+        fullName:
+          type: string
+          example: Nguyen Van A
+        phone:
+          type: string
+          example: 0901234567
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: Password@123
+        role:
+          type: string
+          enum:
+          - CUSTOMER
+          - DRIVER
+          example: CUSTOMER
+    LoginRequest:
+      type: object
+      required:
+      - phone
+      - password
+      properties:
+        phone:
+          type: string
+          example: 0901234567
+        password:
+          type: string
+          format: password
+          example: Password@123
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOi...
+        tokenType:
+          type: string
+          example: Bearer
+        userId:
+          type: string
+          example: USR-001
+        role:
+          type: string
+          enum:
+          - CUSTOMER
+          - DRIVER
+          - OPERATOR
+          - ADMIN
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: CUS-001
+        fullName:
+          type: string
+          example: Nguyen Van A
+        phone:
+          type: string
+          example: 0901234567
+        email:
+          type: string
+          format: email
+          example: a@example.com
+    Driver:
+      type: object
+      properties:
+        id:
+          type: string
+          example: DRV-001
+        fullName:
+          type: string
+          example: Tran Van B
+        phone:
+          type: string
+          example: 0912345678
+        availability:
+          type: string
+          enum:
+          - AVAILABLE
+          - OFFLINE
+          - BUSY
+          example: AVAILABLE
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: string
+          example: VEH-001
+        plateNumber:
+          type: string
+          example: 51A-123.45
+        vehicleType:
+          type: string
+          enum:
+          - CAR
+          - SUV
+          - VAN
+          example: CAR
+        brand:
+          type: string
+          example: Toyota
+        model:
+          type: string
+          example: Vios
+    Location:
+      type: object
+      required:
+      - latitude
+      - longitude
+      - address
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 10.7769
+        longitude:
+          type: number
+          format: double
+          example: 106.7009
+        address:
+          type: string
+          example: Đại học Công nghiệp TP.HCM
+    RideCreateRequest:
+      type: object
+      required:
+      - pickup
+      - destination
+      - vehicleType
+      properties:
+        pickup:
+          $ref: '#/components/schemas/Location'
+        destination:
+          $ref: '#/components/schemas/Location'
+        vehicleType:
+          type: string
+          enum:
+          - CAR
+          - SUV
+          - VAN
+          example: CAR
+        paymentMethod:
+          type: string
+          enum:
+          - CASH
+          - ELECTRONIC
+          example: CASH
+    FareEstimate:
+      type: object
+      properties:
+        currency:
+          type: string
+          example: VND
+        estimatedFare:
+          type: number
+          format: double
+          example: 85000
+        distanceKm:
+          type: number
+          format: double
+          example: 8.5
+    Ride:
+      type: object
+      properties:
+        id:
+          type: string
+          example: RIDE-001
+        customerId:
+          type: string
+          example: CUS-001
+        driverId:
+          type: string
+          nullable: true
+          example: DRV-001
+        pickup:
+          $ref: '#/components/schemas/Location'
+        destination:
+          $ref: '#/components/schemas/Location'
+        vehicleType:
+          type: string
+          example: CAR
+        status:
+          type: string
+          enum:
+          - SEARCHING_DRIVER
+          - DRIVER_ASSIGNED
+          - DRIVER_ARRIVING
+          - DRIVER_ARRIVED
+          - PASSENGER_PICKED_UP
+          - IN_PROGRESS
+          - COMPLETED
+          - PAID
+          - CANCELLED
+          - NO_DRIVER_FOUND
+          - INCIDENT
+          example: SEARCHING_DRIVER
+        estimatedFare:
+          type: number
+          format: double
+          example: 85000
+        finalFare:
+          type: number
+          format: double
+          nullable: true
+          example: 92000
+    DriverResponse:
+      type: object
+      required:
+      - decision
+      properties:
+        decision:
+          type: string
+          enum:
+          - ACCEPT
+          - REJECT
+          example: ACCEPT
+    TripStatusUpdate:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - DRIVER_ARRIVING
+          - DRIVER_ARRIVED
+          - PASSENGER_PICKED_UP
+          - IN_PROGRESS
+          - COMPLETED
+          example: DRIVER_ARRIVED
+    LocationUpdate:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: 10.7801
+        longitude:
+          type: number
+          format: double
+          example: 106.6995
+        timestamp:
+          type: string
+          format: date-time
+    PaymentRequest:
+      type: object
+      required:
+      - rideId
+      - method
+      properties:
+        rideId:
+          type: string
+          example: RIDE-001
+        method:
+          type: string
+          enum:
+          - CASH
+          - ELECTRONIC
+          example: ELECTRONIC
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: PAY-001
+        rideId:
+          type: string
+          example: RIDE-001
+        amount:
+          type: number
+          format: double
+          example: 92000
+        method:
+          type: string
+          enum:
+          - CASH
+          - ELECTRONIC
+          example: ELECTRONIC
+        status:
+          type: string
+          enum:
+          - PENDING
+          - SUCCESS
+          - FAILED
+          example: SUCCESS
+    RatingRequest:
+      type: object
+      required:
+      - score
+      properties:
+        score:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        comment:
+          type: string
+          example: Tài xế thân thiện, lái xe an toàn.
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          example: NOTI-001
+        type:
+          type: string
+          example: DRIVER_ASSIGNED
+        title:
+          type: string
+          example: Đã tìm thấy tài xế
+        message:
+          type: string
+          example: Tài xế đã nhận chuyến của bạn.
+        read:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+    Incident:
+      type: object
+      properties:
+        id:
+          type: string
+          example: INC-001
+        rideId:
+          type: string
+          example: RIDE-001
+        type:
+          type: string
+          example: DRIVER_NO_RESPONSE
+        description:
+          type: string
+          example: Tài xế không phản hồi.
+        status:
+          type: string
+          enum:
+          - OPEN
+          - RESOLVED
+          example: OPEN
+externalDocs:
+  description: Tài liệu BA của CAB System
+  url: https://swagger.io/specification/
